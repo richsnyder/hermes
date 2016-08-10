@@ -1,0 +1,20 @@
+= Hermes Documentation
+:linkcss:
+:stylesheet: assets/style.css
+:imagesdir: assets
+:toc: left
+
+image::hermes.svg[Hermes icon, 128, 128, align="center"]
+
+include::../README.adoc[lines=3..-1]
+
+include::tutorial.adoc[leveloffset=+1]
+
+include::../INSTALL.adoc[leveloffset=+1]
+
+include::grammar.adoc[leveloffset=+1]
+
+== Code Generator
+include::hermes.adoc[leveloffset=+1,lines=8..-1]
+
+include::../LICENSE.adoc[leveloffset=+1]

@@ -1,0 +1,195 @@
+= Installation
+
+== Quick Start
+
+The basic process for setting up Hermes on a Unix-like or Mac OS X system with
+default configuration options is:
+
+----
+mkdir build
+cd build
+cmake /path/to/hermes-x.y.z
+make install
+----
+
+Detailed instructions are provided below.
+
+
+== Prerequisites
+
+Hermes relies on a handful of external software packages that are not included
+in the Hermes distribution.  These are:
+
+CMake::
+  The CMake build system is used to manage compilation, testing, and
+  installation.  It can be downloaded at https://cmake.org/download/.
+  CMake versions 3.0 and above provide the necessary functionality.
+
+C++ compiler::
+  A pass:[C++] compiler that supports the pass:[C++14] standard is required to
+  build the Hermes source generator and the pass:[C++] language binding.  The
+  following compilers are known to work:
+  * Apple Clang 7.3
+  * GNU C++ 6.1
+  * Intel C++ 16.0
+
+Fortran compiler::
+  The Hermes Fortran binding relies on features found in the Fortran 2003
+  standard.  The following compilers are known to work:
+  * GNU Fortran 6.1
+  * Intel Fortran 16.0
+
+boost::
+  The Hermes code generator uses the Boost optional and variant header-only
+  libraries.  Boost can be obtained at  http://www.boost.org/users/download/.
+  Version 1.60 or higher is required.
+
+libzmq::
+  The Hermes C++ and Fortran language bindings interface with the native C
+  library of ØMQ.  This software can be found at
+  http://zeromq.org/intro:get-the-software.  Version 4.1 or above is required.
+
+asciidoctor::
+  The asciidoctor text processor and publishing toolchain is used to generate
+  documentation.  If you wish to build the documentation, then you will need
+  to have it installed on your system.  You can find installation instructions
+  at http://asciidoctor.org.
+
+
+== Configure Phase
+
+Before you can build the software artifacts from the source code, you need to
+generate a set of build instructions that are suitable for your system.  Hermes
+uses the CMake program to make sure that all prerequisites are satisfied and to
+see that the build process is properly configured.
+
+Hermes can be configured and built in a different location than the root
+distribution directory.  This is called an *out-of-source* build and is
+recommended because it keeps all intermediate files separate from the original
+source.  To prepare for an out-of-source build, create a temporary directory
+and run `cmake` from within this directory.
+
+----
+mkdir build
+cd build
+cmake /path/to/hermes-x.y.z
+----
+
+The `cmake` program runs without user interaction.   Interactive text- and
+graphics-based user interfaces for CMake may be installed on your system.
+These will be named `ccmake` and `cmake-gui`, respectively, and may be used in
+place of the `cmake` command line interface.
+
+=== Compilers
+
+CMake will probe your system for common C++ and Fortran compilers and select
+the first ones that it finds.  If it has trouble finding a suitable compiler or
+if you wish to override its choice, you can force the selection by setting the
+`CXX` and `FC` environment variables.  For example, to force use of the Intel
+compilers:
+
+----
+CXX=iCC FC=ifort cmake /path/to/hermes-x.y.z
+----
+
+=== Installation Prefix
+
+By default, artifacts will be installed under `/usr/local`.  The installation
+location can be changed by setting the `CMAKE_INSTALL_PREFIX` CMake option.
+
+----
+cmake -DCMAKE_INSTALL_PREFIX=/path/to/install /path/to/hermes-x.y.z
+----
+
+=== Language Support
+
+CMake will, by default, build a language binding if it can satisfy all of that
+binding's dependencies.  The CMake options `WITH_CPP` and `WITH_FORTRAN` can be
+set to change this behavior.  They can be assigned any of the following values:
+
+`AUTO` (default)::
+  Enable the language binding if its dependencies can be satisfied.
+`ON`::
+  Halt if a required dependency cannot be satisfied.  Otherwise enable the
+  binding.
+`OFF`::
+  Disable the language binding without checking for its dependencies.
+
+For example, the following command will skip the Fortran binding while
+requiring C++ support.
+
+----
+cmake -DWITH_CPP=ON -DWITH_FORTRAN=OFF /path/to/hermes-x.y.z
+----
+
+=== Documentation
+
+By default, documentation will be built if the document generation toolchain
+can be found.  The `WITH_DOCS` CMake variable can be used to change this
+behavior.  Valid values are:
+
+`AUTO` (default)::
+  Create documentation if the document generation toolchain can be found.
+`ON`::
+  Halt if the documentation toolchain cannot be found.  Otherwise, build the
+  documentation.
+`OFF`::
+  Do not build the documentation.
+
+For example, the following command disables generation of the documentation:
+
+----
+cmake -DWITH_DOCS=OFF /path/to/hermes-x.y.z
+----
+
+
+== Testing
+
+By default, unit tests will not be built.  The `BUILD_TESTS` CMake variable can
+be used to configure the build to include available tests.  Valid values for
+this variable are:
+
+`ON`::
+  Build all of the unit tests that correspond to enabled features.
+`OFF` (default)::
+  Do not build any of the unit tests.
+
+The following command enables testing:
+
+----
+cmake -DBUILD_TESTS=ON /path/to/hermes-x.y.z
+----
+
+
+== Build Phase
+
+After the build has been configured with CMake, you can generate the Hermes
+artifacts by executing:
+
+----
+make
+----
+
+
+== Testing Phase
+
+If testing was enabled in the configuration phase with `-DBUILD_TESTS=ON`, the
+following command will trigger execution of all of the generated tests.
+
+----
+make test
+----
+
+A summary of the test results will be printed to the screen.  Afterwards, the
+full output generated by the tests can then be found under the
+`Testing/Temporary` folder in the build directory.
+
+
+== Install Phase
+
+The final phase of the build process is to move the artifacts into their
+installed location.
+
+----
+make install
+----

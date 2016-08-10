@@ -1,0 +1,7 @@
+= Tutorial
+
+*TO BE DONE*
+
+The `hermes` command-line utility generates client and server stub source code
+from special files written in a domain-specific language: the Hermes interface
+definition language (IDL).

@@ -1,0 +1,24 @@
+= Hermes
+
+== Overview
+
+Hermes is a high performance and cross-language remote procedure call (RPC)
+framework.  By using Hermes, a client program can directly trigger execution of
+procedures defined within the address space of a server application, which
+often resides on another computer on a shared network.  Hermes hides the messy
+details of the interactions that have to occur between the caller and the
+executor, leaving the software developer free to focus on getting things done.
+
+Hermes includes a code generator and a software stack for pass:[C++] and
+Fortran.  The framework relies on an interface definition that specifies the
+methods that can be called remotely, including their parameters and return
+types.  The code generator interprets this definition and automatically creates
+a server skeleton and a client stub.  The server program links an
+implementation of the interface against the server skeleton to listen for and
+respond to requests from clients.  A client program links against the client
+stub to invoke a server's remotely callable procedures.
+
+The http://zeromq.org[ØMQ] library for decentralized messaging and computing is
+used to handle client-server communications.  With ØMQ under the hood, Hermes
+supports one-to-many and many-to-one connections and can use any of several
+transport protocols, including TCP, inter-process, and inter-thread transport.

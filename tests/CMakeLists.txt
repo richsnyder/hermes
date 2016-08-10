@@ -1,0 +1,21 @@
+# Identify the directories that contain include files.
+
+INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_SOURCE_DIR})
+
+# Add the testing subdirectories.
+
+IF(BUILD_COMPILER OR BUILD_CPP)
+  ADD_SUBDIRECTORY(gtest)
+ENDIF()
+IF(BUILD_COMPILER)
+  ADD_SUBDIRECTORY(compiler)
+ENDIF()
+IF(BUILD_CPP)
+  ADD_SUBDIRECTORY(cpp)
+ENDIF()
+IF(BUILD_FORTRAN)
+  ADD_SUBDIRECTORY(fortran)
+ENDIF()
+IF(BUILD_PYTHON)
+  ADD_SUBDIRECTORY(python)
+ENDIF()

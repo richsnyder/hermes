@@ -1,0 +1,2 @@
+class HermesError(RuntimeError):
+    pass

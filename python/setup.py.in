@@ -1,0 +1,35 @@
+from setuptools import setup
+from codecs import open
+from os import path
+
+heading = 'Overview\n\n'
+project_dir = path.abspath('@PROJECT_SOURCE_DIR@')
+with open(path.join(project_dir, 'README.adoc'), encoding='utf-8') as f:
+    long_description = f.read()
+try:
+    offset = long_description.index(heading) + len(heading)
+    long_description = long_description[offset:]
+except ValueError:
+    pass
+
+setup(
+    name = 'hermes',
+    version = '@PROJECT_VERSION@',
+    description = 'Python binding for the Hermes RPC framework',
+    long_description = long_description,
+    license = 'Public Domain',
+    classifiers = [
+        'Development Status :: 2 - Pre-Alpha',
+        'Intended Audience :: Developers',
+        'License :: Public Domain',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Topic :: Software Development',
+        'Topic :: Software Development :: Libraries',
+        'Topic :: Software Development :: Libraries :: Python Modules'
+    ],
+    keywords = 'rpc zeromq',
+    packages = ['hermes'],
+    install_requires = ['pyzmq'],
+    package_dir = {'' : '@CMAKE_CURRENT_SOURCE_DIR@'}
+)

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="1024px" height="1024px" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 3.8.3 (29802) - http://www.bohemiancoding.com/sketch -->
+    <title>Round Icon</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="50%" y1="100.999999%" x2="50%" y2="0%" id="linearGradient-1">
+            <stop stop-color="#442C27" offset="0%"></stop>
+            <stop stop-color="#DDC59F" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-2">
+            <stop stop-color="#FFFFFF" offset="0%"></stop>
+            <stop stop-color="#E3DEDE" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-3">
+            <stop stop-color="#FFFFFF" offset="0%"></stop>
+            <stop stop-color="#777777" offset="100%"></stop>
+        </linearGradient>
+        <circle id="path-4" cx="512" cy="512" r="448"></circle>
+        <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="filter-5">
+            <feOffset dx="0" dy="8" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="10" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feComposite in="shadowBlurOuter1" in2="SourceAlpha" operator="out" result="shadowBlurOuter1"></feComposite>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.35 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <mask id="mask-6" maskContentUnits="userSpaceOnUse" maskUnits="objectBoundingBox" x="0" y="0" width="896" height="896" fill="white">
+            <use xlink:href="#path-4"></use>
+        </mask>
+        <mask id="mask-7" maskContentUnits="userSpaceOnUse" maskUnits="objectBoundingBox" x="0" y="0" width="896" height="896" fill="white">
+            <use xlink:href="#path-4"></use>
+        </mask>
+        <linearGradient x1="50%" y1="-12.0263818%" x2="50%" y2="111.894797%" id="linearGradient-8">
+            <stop stop-color="#FFFFFF" offset="0%"></stop>
+            <stop stop-color="#E3DDDD" offset="100%"></stop>
+        </linearGradient>
+        <path d="M387.219717,375.731504 C365.569424,403.824028 322.268836,512.075494 473.820885,512.075494 C492.232093,596.34038 495.471181,793.529304 495.471181,858.480183 C495.471181,883.517563 527.327135,885.103278 527.327135,858.480183 C527.327135,793.529304 526.282677,588.90232 538.771767,512.075494 C711.974128,512.075494 668.673542,370.213216 602.764876,353.40041 C572.235404,345.612572 573.361493,372.099159 587.256585,375.731504 C632.874412,387.656554 653.725537,481.035655 509.878226,481.035655 C366.030915,481.035655 402.745147,412.58597 418.969955,382.173735 C430.520302,360.523441 405.587882,351.897735 387.219717,375.731504 Z M475.48589,304.668222 C429.842459,331.210388 446.129023,393.729364 479.620377,409.87723 C513.111731,426.025095 517.121474,397.611194 501.638556,389.082165 C487.017463,381.027888 467.774031,352.277725 503.914585,323.597429 C517.714838,312.645872 503.914587,288.136616 475.48589,304.668222 Z M546.000514,403.824027 C560.422061,432.623781 586.298813,403.824027 573.244151,386.329366 C558.547873,366.63476 527.730965,364.853501 498.718726,364.8535 C525.325964,376.10679 532.535275,376.934016 546.000514,403.824027 Z M542.22017,301.518993 C554.235659,278.762927 580.377722,300.434131 565.909692,317.867713 C548.4774,338.873148 527.593536,352.114923 498.581298,352.114924 C522.036133,336.027319 533.566469,317.908185 542.22017,301.518993 Z M452.170595,155 C373.223139,155 247.904329,266.22207 421.170928,336.137262 C437.725787,342.81735 456.700432,317.826104 430.520299,306.895623 C384.166686,287.542502 328.792468,208.97139 452.170598,208.97139 C495.471176,208.97139 495.471179,155 452.170595,155 Z M560.422063,156.710458 C639.36952,156.710458 733.624404,252.271976 603.722646,332.433032 C588.409931,341.882353 575.420812,325.005544 593.561383,317.222855 C635.475913,299.240637 675.283847,203.171902 551.905718,203.171902 C508.60514,203.171902 517.12148,156.710458 560.422063,156.710458 Z" id="path-9"></path>
+        <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="filter-10">
+            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="3" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.25 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Round-Icon">
+            <g id="Icon-Shape">
+                <use fill="black" fill-opacity="1" filter="url(#filter-5)" xlink:href="#path-4"></use>
+                <use stroke="url(#linearGradient-2)" mask="url(#mask-6)" stroke-width="72" fill="url(#linearGradient-1)" fill-rule="evenodd" xlink:href="#path-4"></use>
+                <use stroke="url(#linearGradient-3)" mask="url(#mask-7)" stroke-width="2" xlink:href="#path-4"></use>
+            </g>
+            <g id="Caduceus">
+                <use fill="black" fill-opacity="1" filter="url(#filter-10)" xlink:href="#path-9"></use>
+                <use fill="url(#linearGradient-8)" fill-rule="evenodd" xlink:href="#path-9"></use>
+            </g>
+        </g>
+    </g>
+</svg>

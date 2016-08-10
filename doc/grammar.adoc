@@ -1,0 +1,185 @@
+= Interface Description Language
+
+== Starting Expression
+
+----
+Document           ::=  Rule*
+----
+
+
+== Rules
+
+----
+Rule               ::=  Namespace
+                        | Constant
+                        | Alias
+                        | Enumeration
+                        | Structure
+                        | Exception
+                        | Interface
+----
+
+=== Comments
+
+----
+Comment            ::=  '/*' (Printable - '*/') '*/'
+CxxComment         ::=  '//' (Printable - EOL) EOL
+----
+
+=== Namespace
+
+----
+Namespace          ::=  'namespace' Identifier '=' DottedIdentifier ';'
+----
+
+=== Constant
+
+----
+BooleanAssign      ::=  BooleanType Identifier '=' Boolean
+CharacterAssign    ::=  CharacterType Identifier '=' Character
+StringAssign       ::=  StringType Identifier '=' String
+SignedAssign       ::=  IntegerType Identifier '=' Integer
+UnsignedAssign     ::=  UnsignedType Identifier '=' Unsigned
+FloatAssign        ::=  FloatType Identifier '=' Float
+Assignment         ::=  BooleanAssign
+                        | CharacterAssign
+                        | StringAssign
+                        | SignedAssign
+                        | UnsignedAssign
+                        | FloatAssign
+Constant           ::=  'constant' Assignment ';'
+----
+
+=== Alias
+
+----
+Alias              ::=  'alias' Identifier '=' Datatype ';'
+----
+
+=== Enumeration
+
+----
+EnumerationItem    ::=  Identifier ('=' Integer)?
+EnumerationItems   ::=  EnumerationItem (',' EnumerationItem)*
+Enumeration        ::=  'enumeration' Identifier '{' EnumerationItems? '}'
+----
+
+=== Structure
+
+----
+Field              ::=  Datatype Identifier
+Fields             ::=  Field (',' Field)*
+Structure          ::=  'structure' Identifier '{' Fields? '}'
+----
+
+=== Exception
+
+----
+Exception          ::=  'exception' Identifier '{' Fields? '}'
+----
+
+=== Interface
+
+----
+Throws             ::=  'throws' '(' Handle (',' Handle)* ')'
+Function           ::=  Datatype Identifier '(' Fields? ')' Throws?
+Functions          ::=  Function (',' Function)*
+Interface          ::=  'interface' Identifier '{' Functions? '}'
+----
+
+
+== Data Types
+
+----
+BooleanType        ::=  'bool'
+CharacterType      ::=  'char'
+StringType         ::=  'string'
+IntegerType        ::=  'int8' | 'int16' | 'int32' | 'int64'
+UnsignedType       ::=  'uint8' | 'uint16' | 'uint32' | 'uint64'
+FloatType          ::=  'real32' | 'real64'
+BasicType          ::=  'void'
+                        | BooleanType
+                        | CharacterType
+                        | StringType
+                        | IntegerType
+                        | UnsignedType
+                        | FloatType
+
+MapType            ::=  'map' '<' Datatype ',' Datatype '>'
+SetType            ::=  'set' '<' Datatype '>'
+VectorType         ::=  'vector' '<' Datatype '>'
+ContainerType      ::=  MapType | SetType | VectorType
+
+Handle             ::=  Identifier
+
+Datatype           ::=  BasicType | ContainerType | Handle
+----
+
+
+== Basic Definitions
+
+=== Bases
+
+----
+OctalBase          ::=  '0'
+HexadecimalBase    ::=  '0' ('x' | 'X')
+----
+
+=== Digits
+
+----
+OctalDigit         ::=  ['0'-'7']
+DecimalDigit       ::=  ['0'-'9']
+HexadecimalDigit   ::=  ['0'-'9'] | ['A'-'F'] | ['a'-'f']
+----
+
+=== Characters
+
+----
+Letter             ::=  ['A'-'Z'] | ['a'-'z']
+Alphanumeric       ::=  Letter | DecimalDigit
+Character          ::=  [#x00-#xFF]
+Printable          ::=  [#x20-#x7E]
+----
+
+=== Whitespace
+
+----
+WS                 ::=  ' ' | '\t' | '\n' | '\r' | '\v' | '\f'
+EOL                ::=  '\n' | '\r\n'
+----
+
+=== Identifiers
+
+----
+Identifier         ::=  (Letter | '_') (Alphanumeric | '_')*
+DottedIdentifier   ::=  Identifier ('.' Identifier)*
+----
+
+=== Literals
+
+----
+Sign               ::=  '+' | '-'
+Octal              ::=  OctalBase OctalDigit+
+Decimal            ::=  '0' | ((DecimalDigit - '0') DecimalDigit*)
+Hexadecimal        ::=  HexadecimalBase HexadecimalDigit+
+
+Exponent           ::=  ('e' | 'E') Sign? Decimal
+DecimalValue       ::=  ('.' DecimalDigit+) | (DecimalDigit+ '.' DecimalDigit*)
+DecimalFloat       ::=  Sign? DecimalValue Exponent?
+
+BinaryExponent     ::=  ('p' | 'P') Sign? Decimal
+BinaryValue        ::=  ('.' HexadecimalDigit+) | (HexadecimalDigit+ '.' HexadecimalDigit*)
+BinaryFloat        ::=  Sign? HexadecimalBase BinaryValue BinaryExponent?
+
+Infinity           ::=  Sign? 'inf' | 'infinity'
+NotNumber          ::=  Sign? 'nan' ('(' Alphanumeric+ ')')?
+----
+
+----
+Boolean            ::=  'true' | 'false'
+Integer            ::=  Sign? (Hexadecimal | Octal | Decimal)
+Unsigned           ::=  '+'? (Hexadecimal | Octal | Decimal)
+Float              ::=  DecimalFloat | BinaryFloat | Infinity | NotNumber
+String             ::=  '"' (Character - '"')* '"'
+----
