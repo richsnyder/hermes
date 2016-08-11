@@ -56,6 +56,7 @@ public:
   template <typename T>
   bool operator()(std::set<T>& a_set)
   {
+    T key;
     std::uint32_t n;
     std::uint32_t l_set;
     int code = xdr_u_int(&m_xdr, &l_set);
@@ -63,10 +64,10 @@ public:
     {
       return false;
     }
-    a_set.resize(l_set);
     for (n = 0; n < l_set; ++n)
     {
-      code &= operator()(a_set[n]);
+      code &= operator()(key);
+      a_set.insert(key);
     }
     return code;
   }
@@ -146,12 +147,11 @@ public:
   template <typename T>
   bool operator()(std::set<T>& a_set)
   {
-    std::uint32_t n;
     std::uint32_t l_set = a_set.size();
     int code = xdr_u_int(&m_xdr, &l_set);
-    for (n = 0; n < l_set; ++n)
+    for (const auto& key : a_set)
     {
-      code &= operator()(a_set[n]);
+      code &= operator()(key);
     }
     return code;
   }
