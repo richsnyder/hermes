@@ -206,7 +206,16 @@ generator::write_structure(const state::structure& a_structure)
   {
     if (field_.type()->is_vector())
     {
-      resize(name, field_);
+      resizer(name, field_);
+    }
+  }
+  for (const auto& field_ : a_structure.fields())
+  {
+    if (field_.type()->is_map() ||
+        field_.type()->is_set() ||
+        field_.type()->is_vector())
+    {
+      clearer(name, field_);
     }
   }
   for (const auto& field_ : a_structure.fields())
@@ -237,6 +246,7 @@ generator::write_structure(const state::structure& a_structure)
     else if (field_.type()->is_vector())
     {
       vector_setter(name, field_);
+      vector_pusher(name, field_);
     }
   }
   m_hpp << std::endl;
@@ -598,7 +608,7 @@ generator::size(const std::string& a_class, const state::field& a_field)
 }
 
 void
-generator::resize(const std::string& a_class, const state::field& a_field)
+generator::resizer(const std::string& a_class, const state::field& a_field)
 {
   pointer field_type = translate(a_field.type());
   std::string method = "resize_" + a_field.name();
@@ -611,6 +621,24 @@ generator::resize(const std::string& a_class, const state::field& a_field)
   m_cpp << tab << "{" << std::endl;
   m_cpp << indent;
   m_cpp << tab << var << ".resize(a_count);" << std::endl;
+  m_cpp << unindent;
+  m_cpp << tab << "}" << std::endl << std::endl;
+}
+
+void
+generator::clearer(const std::string& a_class, const state::field& a_field)
+{
+  pointer field_type = translate(a_field.type());
+  std::string method = "clear_" + a_field.name();
+  std::string var = member(a_field.name());
+
+  m_hpp << tab << "void " << method << "();" << std::endl;
+
+  m_cpp << tab << "void" << std::endl;
+  m_cpp << tab << a_class << "::" << method << "()" << std::endl;
+  m_cpp << tab << "{" << std::endl;
+  m_cpp << indent;
+  m_cpp << tab << var << ".clear();" << std::endl;
   m_cpp << unindent;
   m_cpp << tab << "}" << std::endl << std::endl;
 }
@@ -741,6 +769,27 @@ generator::vector_setter(const std::string& a_class, const state::field& a_field
   m_cpp << tab << "{" << std::endl;
   m_cpp << indent;
   m_cpp << tab << var << "[a_pos] = a_value;" << std::endl;
+  m_cpp << unindent;
+  m_cpp << tab << "}" << std::endl << std::endl;
+}
+
+void
+generator::vector_pusher(const std::string& a_class, const state::field& a_field)
+{
+  auto as_vector = std::dynamic_pointer_cast<state::vector>(a_field.type());
+  pointer field_type = translate(a_field.type());
+  pointer value_type = translate(as_vector->value_type());
+  std::string method = "push_back_" + a_field.name();
+  std::string type = value_type->param_type();
+  std::string var = member(a_field.name());
+
+  m_hpp << tab << "void " << method << "(" << type << " a_value);" << std::endl;
+
+  m_cpp << tab << "void" << std::endl;
+  m_cpp << tab << a_class << "::" << method << "(" << type << " a_value)" << std::endl;
+  m_cpp << tab << "{" << std::endl;
+  m_cpp << indent;
+  m_cpp << tab << var << ".push_back(a_value);" << std::endl;
   m_cpp << unindent;
   m_cpp << tab << "}" << std::endl << std::endl;
 }
