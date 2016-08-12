@@ -4,6 +4,7 @@
 #include "parser/alias.hpp"
 #include "parser/common.hpp"
 #include "parser/constant.hpp"
+#include "parser/datatype.hpp"
 #include "parser/enumeration.hpp"
 #include "parser/exception.hpp"
 #include "parser/interface.hpp"

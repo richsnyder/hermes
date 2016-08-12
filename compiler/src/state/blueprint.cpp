@@ -111,7 +111,7 @@ blueprint::token(const std::string& a_identifier)
 }
 
 blueprint::pointer
-blueprint::datatype()
+blueprint::type()
 {
   pointer ptr = m_datatypes.top();
   m_datatypes.pop();
@@ -119,7 +119,7 @@ blueprint::datatype()
 }
 
 void
-blueprint::datatype(pointer a_datatype)
+blueprint::type(pointer a_datatype)
 {
   m_datatypes.push(std::move(a_datatype));
 }
@@ -127,7 +127,7 @@ blueprint::datatype(pointer a_datatype)
 void
 blueprint::make_alias()
 {
-  m_aliases.push_back(std::make_shared<alias>(token(), datatype()));
+  m_aliases.push_back(std::make_shared<alias>(token(), type()));
   assert(m_tokens.empty());
   assert(m_datatypes.empty());
 }
@@ -136,7 +136,7 @@ void
 blueprint::make_constant()
 {
   std::string str = token();
-  pointer ptr = datatype();
+  pointer ptr = type();
   constant::value_type value;
   if (ptr->is_bool())
   {
@@ -229,7 +229,7 @@ blueprint::make_exception()
   std::vector<field> fields;
   while (!m_datatypes.empty())
   {
-    fields.emplace(fields.begin(), token(), datatype());
+    fields.emplace(fields.begin(), token(), type());
   }
   m_exceptions.insert(std::make_shared<exception>(token(), fields));
   assert(m_tokens.empty());
@@ -248,8 +248,8 @@ blueprint::make_interface()
 void
 blueprint::make_map()
 {
-  pointer value = datatype();
-  pointer key = datatype();
+  pointer value = type();
+  pointer key = type();
   m_datatypes.push(std::make_shared<map>(key, value));
 }
 
@@ -261,13 +261,13 @@ blueprint::make_procedure()
   std::vector<std::shared_ptr<exception>> exceptions;
   while (m_datatypes.size() > m_tokens.size())
   {
-    exceptions.emplace_back(std::dynamic_pointer_cast<exception>(datatype()));
+    exceptions.emplace_back(std::dynamic_pointer_cast<exception>(type()));
   }
   while (m_tokens.size() > 1)
   {
-    parameters.emplace(parameters.begin(), token(), datatype());
+    parameters.emplace(parameters.begin(), token(), type());
   }
-  m_working_interface->add(token(), datatype(), parameters, exceptions);
+  m_working_interface->add(token(), type(), parameters, exceptions);
   assert(m_tokens.empty());
   assert(m_datatypes.empty());
 }
@@ -275,7 +275,7 @@ blueprint::make_procedure()
 void
 blueprint::make_set()
 {
-  m_datatypes.push(std::make_shared<set>(datatype()));
+  m_datatypes.push(std::make_shared<set>(type()));
 }
 
 void
@@ -295,7 +295,7 @@ blueprint::make_structure()
   std::vector<field> fields;
   while (!m_datatypes.empty())
   {
-    fields.emplace(fields.begin(), token(), datatype());
+    fields.emplace(fields.begin(), token(), type());
   }
   m_structures.insert(std::make_shared<structure>(token(), fields));
   assert(m_tokens.empty());
@@ -305,7 +305,7 @@ blueprint::make_structure()
 void
 blueprint::make_vector()
 {
-  m_datatypes.push(std::make_shared<vector>(datatype()));
+  m_datatypes.push(std::make_shared<vector>(type()));
 }
 
 void

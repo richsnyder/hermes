@@ -193,6 +193,62 @@ generator::write_structure(const state::structure& a_structure)
   {
     setter(name, field_);
   }
+  for (const auto& field_ : a_structure.fields())
+  {
+    if (field_.type()->is_map() ||
+        field_.type()->is_set() ||
+        field_.type()->is_vector())
+    {
+      size(name, field_);
+    }
+  }
+  for (const auto& field_ : a_structure.fields())
+  {
+    if (field_.type()->is_vector())
+    {
+      resizer(name, field_);
+    }
+  }
+  for (const auto& field_ : a_structure.fields())
+  {
+    if (field_.type()->is_map() ||
+        field_.type()->is_set() ||
+        field_.type()->is_vector())
+    {
+      clearer(name, field_);
+    }
+  }
+  for (const auto& field_ : a_structure.fields())
+  {
+    if (field_.type()->is_map())
+    {
+      map_getter(name, field_);
+    }
+    else if (field_.type()->is_set())
+    {
+      set_counter(name, field_);
+    }
+    else if (field_.type()->is_vector())
+    {
+      vector_getter(name, field_);
+    }
+  }
+  for (const auto& field_ : a_structure.fields())
+  {
+    if (field_.type()->is_map())
+    {
+      map_inserter(name, field_);
+    }
+    else if (field_.type()->is_set())
+    {
+      set_inserter(name, field_);
+    }
+    else if (field_.type()->is_vector())
+    {
+      vector_setter(name, field_);
+      vector_pusher(name, field_);
+    }
+  }
   m_hpp << std::endl;
   decoder(a_structure);
   encoder(a_structure);
@@ -529,6 +585,216 @@ generator::setter(const std::string& a_class, const state::field& a_field)
   m_cpp << tab << "{" << std::endl;
   m_cpp << indent;
   m_cpp << tab << var << " = " << arg << ";" << std::endl;
+  m_cpp << unindent;
+  m_cpp << tab << "}" << std::endl << std::endl;
+}
+
+void
+generator::size(const std::string& a_class, const state::field& a_field)
+{
+  pointer field_type = translate(a_field.type());
+  std::string method = "size_" + a_field.name();
+  std::string var = member(a_field.name());
+
+  m_hpp << tab << "std::size_t " << method << "() const;" << std::endl;
+
+  m_cpp << tab << "std::size_t" << std::endl;
+  m_cpp << tab << a_class << "::" << method << "() const" << std::endl;
+  m_cpp << tab << "{" << std::endl;
+  m_cpp << indent;
+  m_cpp << tab << "return " << var << ".size();" << std::endl;
+  m_cpp << unindent;
+  m_cpp << tab << "}" << std::endl << std::endl;
+}
+
+void
+generator::resizer(const std::string& a_class, const state::field& a_field)
+{
+  pointer field_type = translate(a_field.type());
+  std::string method = "resize_" + a_field.name();
+  std::string var = member(a_field.name());
+
+  m_hpp << tab << "void " << method << "(const std::size_t a_count);" << std::endl;
+
+  m_cpp << tab << "void" << std::endl;
+  m_cpp << tab << a_class << "::" << method << "(const std::size_t a_count)" << std::endl;
+  m_cpp << tab << "{" << std::endl;
+  m_cpp << indent;
+  m_cpp << tab << var << ".resize(a_count);" << std::endl;
+  m_cpp << unindent;
+  m_cpp << tab << "}" << std::endl << std::endl;
+}
+
+void
+generator::clearer(const std::string& a_class, const state::field& a_field)
+{
+  pointer field_type = translate(a_field.type());
+  std::string method = "clear_" + a_field.name();
+  std::string var = member(a_field.name());
+
+  m_hpp << tab << "void " << method << "();" << std::endl;
+
+  m_cpp << tab << "void" << std::endl;
+  m_cpp << tab << a_class << "::" << method << "()" << std::endl;
+  m_cpp << tab << "{" << std::endl;
+  m_cpp << indent;
+  m_cpp << tab << var << ".clear();" << std::endl;
+  m_cpp << unindent;
+  m_cpp << tab << "}" << std::endl << std::endl;
+}
+
+void
+generator::map_getter(const std::string& a_class, const state::field& a_field)
+{
+  auto as_map = std::dynamic_pointer_cast<state::map>(a_field.type());
+  pointer field_type = translate(a_field.type());
+  pointer key_type = translate(as_map->key_type());
+  pointer value_type = translate(as_map->value_type());
+  std::string method = "get_" + a_field.name();
+  std::string type = value_type->const_reference();
+  std::string var = member(a_field.name());
+  std::string arg = key_type->param_type();
+
+  m_hpp << tab << type << " " << method << "(" << arg << " a_key) const;" << std::endl;
+
+  m_cpp << tab << type << std::endl;
+  m_cpp << tab << a_class << "::" << method << "(" << arg << " a_key) const" << std::endl;
+  m_cpp << tab << "{" << std::endl;
+  m_cpp << indent;
+  m_cpp << tab << "return " << var << "[a_key];" << std::endl;
+  m_cpp << unindent;
+  m_cpp << tab << "}" << std::endl << std::endl;
+}
+
+void
+generator::map_inserter(const std::string& a_class, const state::field& a_field)
+{
+  auto as_map = std::dynamic_pointer_cast<state::map>(a_field.type());
+  pointer field_type = translate(a_field.type());
+  pointer key_type = translate(as_map->key_type());
+  pointer value_type = translate(as_map->value_type());
+  std::string method = "insert_" + a_field.name();
+  std::string key = key_type->param_type();
+  std::string val = value_type->param_type();
+  std::string var = member(a_field.name());
+
+  m_hpp << tab << "void " << method << "(" << key << " a_key, " << val << " a_value);" << std::endl;
+
+  m_cpp << tab << "void" << std::endl;
+  m_cpp << tab << a_class << "::" << method << "(" << key << " a_key, " << val << " a_value)" << std::endl;
+  m_cpp << tab << "{" << std::endl;
+  m_cpp << indent;
+  m_cpp << tab << var << "[a_key] = a_value;" << std::endl;
+  m_cpp << unindent;
+  m_cpp << tab << "}" << std::endl << std::endl;
+}
+
+void
+generator::set_counter(const std::string& a_class, const state::field& a_field)
+{
+  auto as_set = std::dynamic_pointer_cast<state::set>(a_field.type());
+  pointer field_type = translate(a_field.type());
+  pointer key_type = translate(as_set->key_type());
+  std::string method = "count_" + a_field.name();
+  std::string var = member(a_field.name());
+  std::string arg = key_type->param_type();
+
+  m_hpp << tab << "std::size_t " << method << "(" << arg << " a_key) const;" << std::endl;
+
+  m_cpp << tab << "std::size_t" << std::endl;
+  m_cpp << tab << a_class << "::" << method << "(" << arg << " a_key) const" << std::endl;
+  m_cpp << tab << "{" << std::endl;
+  m_cpp << indent;
+  m_cpp << tab << "return " << var << ".count(a_key);" << std::endl;
+  m_cpp << unindent;
+  m_cpp << tab << "}" << std::endl << std::endl;
+}
+
+void
+generator::set_inserter(const std::string& a_class, const state::field& a_field)
+{
+  auto as_set = std::dynamic_pointer_cast<state::set>(a_field.type());
+  pointer field_type = translate(a_field.type());
+  pointer key_type = translate(as_set->key_type());
+  std::string method = "insert_" + a_field.name();
+  std::string var = member(a_field.name());
+  std::string arg = key_type->param_type();
+
+  m_hpp << tab << "void " << method << "(" << arg << " a_key);" << std::endl;
+
+  m_cpp << tab << "void" << std::endl;
+  m_cpp << tab << a_class << "::" << method << "(" << arg << " a_key)" << std::endl;
+  m_cpp << tab << "{" << std::endl;
+  m_cpp << indent;
+  m_cpp << tab << var << ".insert(a_key);" << std::endl;
+  m_cpp << unindent;
+  m_cpp << tab << "}" << std::endl << std::endl;
+}
+
+void
+generator::vector_getter(const std::string& a_class, const state::field& a_field)
+{
+  auto as_vector = std::dynamic_pointer_cast<state::vector>(a_field.type());
+  pointer field_type = translate(a_field.type());
+  pointer value_type = translate(as_vector->value_type());
+  std::string method = "get_" + a_field.name();
+  std::string type = value_type->const_reference();
+  std::string var = member(a_field.name());
+
+  if (as_vector->value_type()->is_bool())
+  {
+    type = value_type->value_type();
+  }
+
+  m_hpp << tab << type << " " << method << "(const std::size_t a_pos) const;" << std::endl;
+
+  m_cpp << tab << type << std::endl;
+  m_cpp << tab << a_class << "::" << method << "(const std::size_t a_pos) const" << std::endl;
+  m_cpp << tab << "{" << std::endl;
+  m_cpp << indent;
+  m_cpp << tab << "return " << var << "[a_pos];" << std::endl;
+  m_cpp << unindent;
+  m_cpp << tab << "}" << std::endl << std::endl;
+}
+
+void
+generator::vector_setter(const std::string& a_class, const state::field& a_field)
+{
+  auto as_vector = std::dynamic_pointer_cast<state::vector>(a_field.type());
+  pointer field_type = translate(a_field.type());
+  pointer value_type = translate(as_vector->value_type());
+  std::string method = "set_" + a_field.name();
+  std::string type = value_type->param_type();
+  std::string var = member(a_field.name());
+
+  m_hpp << tab << "void " << method << "(const std::size_t a_pos, " << type << " a_value);" << std::endl;
+
+  m_cpp << tab << "void" << std::endl;
+  m_cpp << tab << a_class << "::" << method << "(const std::size_t a_pos, " << type << " a_value)" << std::endl;
+  m_cpp << tab << "{" << std::endl;
+  m_cpp << indent;
+  m_cpp << tab << var << "[a_pos] = a_value;" << std::endl;
+  m_cpp << unindent;
+  m_cpp << tab << "}" << std::endl << std::endl;
+}
+
+void
+generator::vector_pusher(const std::string& a_class, const state::field& a_field)
+{
+  auto as_vector = std::dynamic_pointer_cast<state::vector>(a_field.type());
+  pointer field_type = translate(a_field.type());
+  pointer value_type = translate(as_vector->value_type());
+  std::string method = "push_back_" + a_field.name();
+  std::string type = value_type->param_type();
+  std::string var = member(a_field.name());
+
+  m_hpp << tab << "void " << method << "(" << type << " a_value);" << std::endl;
+
+  m_cpp << tab << "void" << std::endl;
+  m_cpp << tab << a_class << "::" << method << "(" << type << " a_value)" << std::endl;
+  m_cpp << tab << "{" << std::endl;
+  m_cpp << indent;
+  m_cpp << tab << var << ".push_back(a_value);" << std::endl;
   m_cpp << unindent;
   m_cpp << tab << "}" << std::endl << std::endl;
 }
@@ -1055,7 +1321,7 @@ generator::rpc_exception(const std::string& a_interface,
   m_hpp << tab << "{" << std::endl;
   m_hpp << indent;
   m_hpp << tab << "static void send(void* a_socket, ";
-  m_hpp << param_type << " " << variable;
+  m_hpp << param_type << " a_result";
   m_hpp << ");" << std::endl;
   m_hpp << tab << "static " << value_type;
   m_hpp << " recv(void* a_socket);" << std::endl;
@@ -1064,14 +1330,14 @@ generator::rpc_exception(const std::string& a_interface,
 
   m_cpp << tab << "void" << std::endl;
   m_cpp << tab << prefix << "::send(void* a_socket, ";
-  m_cpp << param_type << " " << variable;
+  m_cpp << param_type << " a_result";
   m_cpp << ")" << std::endl;
   m_cpp << tab << "{" << std::endl;
   m_cpp << indent;
   m_cpp << tab << "zmq_msg_t message;" << std::endl;
   m_cpp << tab << sizevar("size", get_size("a_result", exception_type));
   m_cpp << tab << "hermes::oarchive archive(size);" << std::endl;
-  m_cpp << tab << "bool status = archive(" << variable << ");" << std::endl;
+  m_cpp << tab << "bool status = archive(a_result);" << std::endl;
   m_cpp << tab << "if (!status)" << std::endl;
   m_cpp << tab << "{" << std::endl;
   m_cpp << indent;

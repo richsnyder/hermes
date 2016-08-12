@@ -13,133 +13,133 @@ template <typename Rule>
 class action : parser::nothing<Rule> {};
 
 template <>
-struct action<parser::datatype::basic::void_t>
+struct action<parser::basic::void_t>
 {
   static void apply(const parser::input& a_input, blueprint& a_blueprint)
   {
-    a_blueprint.datatype(std::make_shared<void_t>());
+    a_blueprint.type(std::make_shared<void_t>());
   }
 };
 
 template <>
-struct action<parser::datatype::basic::bool_t>
+struct action<parser::basic::bool_t>
 {
   static void apply(const parser::input& a_input, blueprint& a_blueprint)
   {
-    a_blueprint.datatype(std::make_shared<bool_t>());
+    a_blueprint.type(std::make_shared<bool_t>());
   }
 };
 
 template <>
-struct action<parser::datatype::basic::char_t>
+struct action<parser::basic::char_t>
 {
   static void apply(const parser::input& a_input, blueprint& a_blueprint)
   {
-    a_blueprint.datatype(std::make_shared<char_t>());
+    a_blueprint.type(std::make_shared<char_t>());
   }
 };
 
 template <>
-struct action<parser::datatype::basic::int8>
+struct action<parser::basic::int8>
 {
   static void apply(const parser::input& a_input, blueprint& a_blueprint)
   {
-    a_blueprint.datatype(std::make_shared<int8>());
+    a_blueprint.type(std::make_shared<int8>());
   }
 };
 
 template <>
-struct action<parser::datatype::basic::int16>
+struct action<parser::basic::int16>
 {
   static void apply(const parser::input& a_input, blueprint& a_blueprint)
   {
-    a_blueprint.datatype(std::make_shared<int16>());
+    a_blueprint.type(std::make_shared<int16>());
   }
 };
 
 template <>
-struct action<parser::datatype::basic::int32>
+struct action<parser::basic::int32>
 {
   static void apply(const parser::input& a_input, blueprint& a_blueprint)
   {
-    a_blueprint.datatype(std::make_shared<int32>());
+    a_blueprint.type(std::make_shared<int32>());
   }
 };
 
 template <>
-struct action<parser::datatype::basic::int64>
+struct action<parser::basic::int64>
 {
   static void apply(const parser::input& a_input, blueprint& a_blueprint)
   {
-    a_blueprint.datatype(std::make_shared<int64>());
+    a_blueprint.type(std::make_shared<int64>());
   }
 };
 
 template <>
-struct action<parser::datatype::basic::uint8>
+struct action<parser::basic::uint8>
 {
   static void apply(const parser::input& a_input, blueprint& a_blueprint)
   {
-    a_blueprint.datatype(std::make_shared<uint8>());
+    a_blueprint.type(std::make_shared<uint8>());
   }
 };
 
 template <>
-struct action<parser::datatype::basic::uint16>
+struct action<parser::basic::uint16>
 {
   static void apply(const parser::input& a_input, blueprint& a_blueprint)
   {
-    a_blueprint.datatype(std::make_shared<uint16>());
+    a_blueprint.type(std::make_shared<uint16>());
   }
 };
 
 template <>
-struct action<parser::datatype::basic::uint32>
+struct action<parser::basic::uint32>
 {
   static void apply(const parser::input& a_input, blueprint& a_blueprint)
   {
-    a_blueprint.datatype(std::make_shared<uint32>());
+    a_blueprint.type(std::make_shared<uint32>());
   }
 };
 
 template <>
-struct action<parser::datatype::basic::uint64>
+struct action<parser::basic::uint64>
 {
   static void apply(const parser::input& a_input, blueprint& a_blueprint)
   {
-    a_blueprint.datatype(std::make_shared<uint64>());
+    a_blueprint.type(std::make_shared<uint64>());
   }
 };
 
 template <>
-struct action<parser::datatype::basic::real32>
+struct action<parser::basic::real32>
 {
   static void apply(const parser::input& a_input, blueprint& a_blueprint)
   {
-    a_blueprint.datatype(std::make_shared<real32>());
+    a_blueprint.type(std::make_shared<real32>());
   }
 };
 
 template <>
-struct action<parser::datatype::basic::real64>
+struct action<parser::basic::real64>
 {
   static void apply(const parser::input& a_input, blueprint& a_blueprint)
   {
-    a_blueprint.datatype(std::make_shared<real64>());
+    a_blueprint.type(std::make_shared<real64>());
   }
 };
 
 template <>
-struct action<parser::datatype::basic::string>
+struct action<parser::basic::string>
 {
   static void apply(const parser::input& a_input, blueprint& a_blueprint)
   {
-    a_blueprint.datatype(std::make_shared<string>());
+    a_blueprint.type(std::make_shared<string>());
   }
 };
 
 template <>
-struct action<parser::datatype::container::map::end>
+struct action<parser::map::end>
 {
   static void apply(const parser::input& a_input, blueprint& a_blueprint)
   {
@@ -148,7 +148,7 @@ struct action<parser::datatype::container::map::end>
 };
 
 template <>
-struct action<parser::datatype::container::set::end>
+struct action<parser::set::end>
 {
   static void apply(const parser::input& a_input, blueprint& a_blueprint)
   {
@@ -157,7 +157,7 @@ struct action<parser::datatype::container::set::end>
 };
 
 template <>
-struct action<parser::datatype::container::vector::end>
+struct action<parser::vector::end>
 {
   static void apply(const parser::input& a_input, blueprint& a_blueprint)
   {
@@ -166,11 +166,11 @@ struct action<parser::datatype::container::vector::end>
 };
 
 template <>
-struct action<parser::datatype::handle>
+struct action<parser::handle>
 {
   static void apply(const parser::input& a_input, blueprint& a_blueprint)
   {
-    a_blueprint.datatype(a_blueprint.find(a_input.string()));
+    a_blueprint.type(a_blueprint.find(a_input.string()));
   }
 };
 
