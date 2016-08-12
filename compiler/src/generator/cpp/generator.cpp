@@ -655,10 +655,10 @@ generator::map_getter(const std::string& a_class, const state::field& a_field)
   std::string var = member(a_field.name());
   std::string arg = key_type->param_type();
 
-  m_hpp << tab << type << " " << method << "(" << arg << " a_key);" << std::endl;
+  m_hpp << tab << type << " " << method << "(" << arg << " a_key) const;" << std::endl;
 
   m_cpp << tab << type << std::endl;
-  m_cpp << tab << a_class << "::" << method << "(" << arg << " a_key)" << std::endl;
+  m_cpp << tab << a_class << "::" << method << "(" << arg << " a_key) const" << std::endl;
   m_cpp << tab << "{" << std::endl;
   m_cpp << indent;
   m_cpp << tab << "return " << var << "[a_key];" << std::endl;
@@ -699,10 +699,10 @@ generator::set_counter(const std::string& a_class, const state::field& a_field)
   std::string var = member(a_field.name());
   std::string arg = key_type->param_type();
 
-  m_hpp << tab << "std::size_t " << method << "(" << arg << " a_key);" << std::endl;
+  m_hpp << tab << "std::size_t " << method << "(" << arg << " a_key) const;" << std::endl;
 
   m_cpp << tab << "std::size_t" << std::endl;
-  m_cpp << tab << a_class << "::" << method << "(" << arg << " a_key)" << std::endl;
+  m_cpp << tab << a_class << "::" << method << "(" << arg << " a_key) const" << std::endl;
   m_cpp << tab << "{" << std::endl;
   m_cpp << indent;
   m_cpp << tab << "return " << var << ".count(a_key);" << std::endl;
@@ -741,10 +741,15 @@ generator::vector_getter(const std::string& a_class, const state::field& a_field
   std::string type = value_type->const_reference();
   std::string var = member(a_field.name());
 
-  m_hpp << tab << type << " " << method << "(const std::size_t a_pos);" << std::endl;
+  if (as_vector->value_type()->is_bool())
+  {
+    type = value_type->value_type();
+  }
+
+  m_hpp << tab << type << " " << method << "(const std::size_t a_pos) const;" << std::endl;
 
   m_cpp << tab << type << std::endl;
-  m_cpp << tab << a_class << "::" << method << "(const std::size_t a_pos)" << std::endl;
+  m_cpp << tab << a_class << "::" << method << "(const std::size_t a_pos) const" << std::endl;
   m_cpp << tab << "{" << std::endl;
   m_cpp << indent;
   m_cpp << tab << "return " << var << "[a_pos];" << std::endl;
@@ -1316,7 +1321,7 @@ generator::rpc_exception(const std::string& a_interface,
   m_hpp << tab << "{" << std::endl;
   m_hpp << indent;
   m_hpp << tab << "static void send(void* a_socket, ";
-  m_hpp << param_type << " " << variable;
+  m_hpp << param_type << " a_result";
   m_hpp << ");" << std::endl;
   m_hpp << tab << "static " << value_type;
   m_hpp << " recv(void* a_socket);" << std::endl;
@@ -1325,14 +1330,14 @@ generator::rpc_exception(const std::string& a_interface,
 
   m_cpp << tab << "void" << std::endl;
   m_cpp << tab << prefix << "::send(void* a_socket, ";
-  m_cpp << param_type << " " << variable;
+  m_cpp << param_type << " a_result";
   m_cpp << ")" << std::endl;
   m_cpp << tab << "{" << std::endl;
   m_cpp << indent;
   m_cpp << tab << "zmq_msg_t message;" << std::endl;
   m_cpp << tab << sizevar("size", get_size("a_result", exception_type));
   m_cpp << tab << "hermes::oarchive archive(size);" << std::endl;
-  m_cpp << tab << "bool status = archive(" << variable << ");" << std::endl;
+  m_cpp << tab << "bool status = archive(a_result);" << std::endl;
   m_cpp << tab << "if (!status)" << std::endl;
   m_cpp << tab << "{" << std::endl;
   m_cpp << indent;
