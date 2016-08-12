@@ -43,8 +43,8 @@ protected:
   std::string token();
   void token(const std::string& a_identifier);
 
-  pointer datatype();
-  void datatype(pointer a_datatype);
+  pointer type();
+  void type(pointer a_datatype);
 
   void make_alias();
   void make_constant();

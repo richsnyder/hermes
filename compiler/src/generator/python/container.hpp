@@ -1,6 +1,7 @@
 #ifndef HERMES_COMPILER_GENERATOR_PYTHON_CONTAINER_HPP
 #define HERMES_COMPILER_GENERATOR_PYTHON_CONTAINER_HPP
 
+#include <memory>
 #include "generator/iomanip.hpp"
 #include "generator/python/datatype.hpp"
 
