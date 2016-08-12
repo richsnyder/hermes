@@ -13,12 +13,7 @@ struct datatype : sor<
     basic,
     container,
     handle
-  >
-{
-  using basic = basic;
-  using container = container;
-  using handle = handle;
-};
+  > {};
 
 } // parser namespace
 } // compiler namespace
