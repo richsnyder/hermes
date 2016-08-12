@@ -15,6 +15,7 @@ SET(CPP_HEADERS
   hermes/client.hpp
   hermes/error.hpp
   hermes/header.hpp
+  hermes/is_bits.hpp
   hermes/memory.hpp
   hermes/server.hpp
 )

@@ -69,6 +69,16 @@ protected:
   void member(const state::field& a_field);
   void getter(const std::string& a_class, const state::field& a_field);
   void setter(const std::string& a_class, const state::field& a_field);
+  void size(const std::string& a_class, const state::field& a_field);
+  void resizer(const std::string& a_class, const state::field& a_field);
+  void clearer(const std::string& a_class, const state::field& a_field);
+  void map_getter(const std::string& a_class, const state::field& a_field);
+  void map_inserter(const std::string& a_class, const state::field& a_field);
+  void set_counter(const std::string& a_class, const state::field& a_field);
+  void set_inserter(const std::string& a_class, const state::field& a_field);
+  void vector_getter(const std::string& a_class, const state::field& a_field);
+  void vector_setter(const std::string& a_class, const state::field& a_field);
+  void vector_pusher(const std::string& a_class, const state::field& a_field);
   void client(const state::interface& a_interface);
   void server(const state::interface& a_interface);
   void rpc(const state::interface& a_interface);
