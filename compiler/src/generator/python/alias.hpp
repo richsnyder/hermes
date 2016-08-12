@@ -1,6 +1,7 @@
 #ifndef HERMES_COMPILER_GENERATOR_PYTHON_ALIAS_HPP
 #define HERMES_COMPILER_GENERATOR_PYTHON_ALIAS_HPP
 
+#include <memory>
 #include "generator/python/datatype.hpp"
 
 namespace hermes {

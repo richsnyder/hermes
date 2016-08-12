@@ -1,6 +1,7 @@
 #ifndef HERMES_COMPILER_STATE_ENUMERATION_HPP
 #define HERMES_COMPILER_STATE_ENUMERATION_HPP
 
+#include <memory>
 #include <vector>
 #include <boost/optional.hpp>
 #include "state/datatype.hpp"
