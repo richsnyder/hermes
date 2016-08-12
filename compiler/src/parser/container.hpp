@@ -52,12 +52,7 @@ struct vector : if_must<
   using end = vector_end;
 };
 
-struct container : sor<map, set, vector>
-{
-  using map = map;
-  using set = set;
-  using vector = vector;
-};
+struct container : sor<map, set, vector> {};
 
 } // parser namespace
 } // compiler namespace

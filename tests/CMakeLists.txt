@@ -2,6 +2,12 @@
 
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_SOURCE_DIR})
 
+# Find required dependencies.
+
+SET(THREADS_PREFER_PTHREAD_FLAG ON)
+FIND_PACKAGE(Threads REQUIRED)
+LIST(APPEND EXTRA_LIBS Threads::Threads)
+
 # Add the testing subdirectories.
 
 IF(BUILD_COMPILER OR BUILD_CPP)

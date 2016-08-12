@@ -33,7 +33,7 @@ structure::size(const std::string& a_variable) const
   std::shared_ptr<sizer> next = nullptr;
   for (const auto& field_ : m_fields)
   {
-    name = a_variable + '.' + field_.name();
+    name = a_variable + ".get_" + field_.name() + "()";
     next = field_.type()->size(name);
     if (first)
     {

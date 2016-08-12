@@ -113,6 +113,26 @@ iarchive::operator()(std::string& a_value)
   return static_cast<bool>(code);
 }
 
+bool
+iarchive::operator()(std::vector<bool>& a_vector)
+{
+  bool b;
+  std::uint32_t n;
+  std::uint32_t l_vector;
+  int code = xdr_u_int(&m_xdr, &l_vector);
+  if (code == 0 || l_vector > 65535)
+  {
+    return false;
+  }
+  a_vector.resize(l_vector);
+  for (n = 0; n < l_vector; ++n)
+  {
+    code &= operator()(b);
+    a_vector[n] = b;
+  }
+  return code;
+}
+
 oarchive::oarchive(size_t a_size)
   : m_size(a_size)
 {
@@ -224,6 +244,27 @@ bool
 oarchive::operator()(const std::string& a_value)
 {
   return operator()(const_cast<std::string&>(a_value));
+}
+
+bool
+oarchive::operator()(std::vector<bool>& a_vector)
+{
+  bool b;
+  std::uint32_t n;
+  std::uint32_t l_vector = a_vector.size();
+  int code = xdr_u_int(&m_xdr, &l_vector);
+  for (n = 0; n < l_vector; ++n)
+  {
+    b = a_vector[n];
+    code &= operator()(b);
+  }
+  return code;
+}
+
+bool
+oarchive::operator()(const std::vector<bool>& a_vector)
+{
+  return operator()(const_cast<std::vector<bool>&>(a_vector));
 }
 
 } // hermes namespace
