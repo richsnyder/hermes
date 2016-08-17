@@ -23,6 +23,7 @@ public:
   virtual std::string in() const = 0;
   virtual std::string out() const;
   virtual std::string target() const;
+  virtual std::string member() const;
   virtual bool allocatable() const;
   virtual std::set<std::string> iso_c_symbols() const;
   virtual std::set<std::string> structures() const;

@@ -168,21 +168,75 @@ generator::structure_type(std::shared_ptr<state::structure> a_structure)
   using state::field;
   auto name = a_structure->name();
   auto fields = a_structure->fields();
-  auto get = [](const field& f) { return "get_" + f.name(); };
-  auto set = [](const field& f) { return "set_" + f.name(); };
-  auto member = [&](const field& f) { private_member(f); };
-  auto getter = [&](const field& f) { public_procedure(name, get(f)); };
-  auto setter = [&](const field& f) { public_procedure(name, set(f)); };
 
   m_src << tab << "type, public, extends(serializable) :: ";
   m_src << name << std::endl;
   m_src << indent << indent;
-  std::for_each(fields.begin(), fields.end(), member);
+  for (const auto& field_ : fields)
+  {
+    if (field_.type()->is_map())
+    {
+      auto as_map = std::dynamic_pointer_cast<state::map>(field_.type());
+      auto key_type = translate(as_map->key_type());
+      auto value_type = translate(as_map->value_type());
+      m_src << tab << key_type->member() << ", dimension(:), allocatable, private :: " << member(field_.name()) << "_k" << std::endl;
+      m_src << tab << value_type->member() << ", dimension(:), allocatable, private :: " << member(field_.name()) << "_v" << std::endl;
+    }
+    else
+    {
+      private_member(field_);
+    }
+  }
   m_src << unindent;
   m_src << tab << "contains" << std::endl;
   m_src << indent;
-  std::for_each(fields.begin(), fields.end(), getter);
-  std::for_each(fields.begin(), fields.end(), setter);
+  for (const auto& field_ : fields)
+  {
+    if (field_.type()->is_set())
+    {
+      public_procedure(name, "count_" + field_.name());
+    }
+    else
+    {
+      public_procedure(name, "get_" + field_.name());
+    }
+  }
+  for (const auto& field_ : fields)
+  {
+    if (field_.type()->is_map() || field_.type()->is_set())
+    {
+      public_procedure(name, "insert_" + field_.name());
+    }
+    else
+    {
+      public_procedure(name, "set_" + field_.name());
+    }
+  }
+  for (const auto& field_ : fields)
+  {
+    if (field_.type()->is_map() ||
+        field_.type()->is_set() ||
+        field_.type()->is_vector())
+    {
+      public_procedure(name, "size_" + field_.name());
+    }
+  }
+  for (const auto& field_ : fields)
+  {
+    if (field_.type()->is_vector())
+    {
+      public_procedure(name, "resize_" + field_.name());
+    }
+  }
+  for (const auto& field_ : fields)
+  {
+    if (field_.type()->is_map() ||
+        field_.type()->is_set() ||
+        field_.type()->is_vector())
+    {
+      public_procedure(name, "clear_" + field_.name());
+    }
+  }
   m_src << std::endl;
   public_procedure(name, "read");
   public_procedure(name, "write");
@@ -206,11 +260,40 @@ generator::structure_procedures(std::shared_ptr<state::structure> a_structure)
   using state::field;
   auto name = a_structure->name();
   auto fields = a_structure->fields();
-  auto get = [&](const field& f){ getter(name, f); };
-  auto set = [&](const field& f){ setter(name, f); };
 
-  std::for_each(fields.begin(), fields.end(), get);
-  std::for_each(fields.begin(), fields.end(), set);
+  for (const auto& field_ : fields)
+  {
+    setter(name, field_);
+  }
+  for (const auto& field_ : fields)
+  {
+    getter(name, field_);
+  }
+  for (const auto& field_ : fields)
+  {
+    if (field_.type()->is_map() ||
+        field_.type()->is_set() ||
+        field_.type()->is_vector())
+    {
+      size(name, field_);
+    }
+  }
+  for (const auto& field_ : fields)
+  {
+    if (field_.type()->is_vector())
+    {
+      resizer(name, field_);
+    }
+  }
+  for (const auto& field_ : fields)
+  {
+    if (field_.type()->is_map() ||
+        field_.type()->is_set() ||
+        field_.type()->is_vector())
+    {
+      clearer(name, field_);
+    }
+  }
   reader(a_structure);
   writer(a_structure);
 }
@@ -466,6 +549,23 @@ generator::category(std::shared_ptr<state::datatype> a_datatype, bool a_input) c
       return "value";
     }
   }
+  else if (a_datatype->is_set())
+  {
+    auto as_set = std::dynamic_pointer_cast<state::set>(a_datatype);
+    auto key_type = as_set->key_type();
+    if (key_type->is_unsigned())
+    {
+      return "unsigned_vector";
+    }
+    else if (key_type->is_char())
+    {
+      return "character_vector";
+    }
+    else
+    {
+      return "vector";
+    }
+  }
   else if (a_datatype->is_vector())
   {
     auto as_vector = std::dynamic_pointer_cast<state::vector>(a_datatype);
@@ -517,8 +617,18 @@ void
 generator::private_member(const state::field& a_field)
 {
   pointer field_type = translate(a_field.type());
-  std::string type = field_type->in();
+  std::string type = field_type->member();
   std::string var = member(a_field.name());
+
+  m_src << tab << type << ", private :: " << var << std::endl;
+}
+
+void
+generator::private_member(const state::field& a_field, const std::string& a_suffix)
+{
+  pointer field_type = translate(a_field.type());
+  std::string type = field_type->member();
+  std::string var = member(a_field.name()) + a_suffix;
 
   m_src << tab << type << ", private :: " << var << std::endl;
 }
@@ -528,24 +638,80 @@ generator::constructor(std::shared_ptr<state::structure> a_structure)
 {
   using state::field;
 
-  pointer t;
+  pointer type;
   bool first = true;
   auto name = a_structure->name();
   auto fields = a_structure->fields();
+  std::string arg;
+  std::string var;
 
   auto sep = [&](){ if (!first) return ", "; first = false; return ""; };
-  auto arg = [&](const field& f){ m_src << sep() << param(f.name()); };
-  auto trn = [&](const field& f){ return translate(f.type()); };
-  auto dec = [&](const field& f){ t = trn(f); m_src << tab << t->in() << ", intent(in) :: " << param(f.name()) << std::endl; };
-  auto set = [&](const field& f){ m_src << tab << "self%" << member(f.name()) << " = " << param(f.name()) << std::endl; };
 
   m_src << tab << "function new_" << name << "(";
-  std::for_each(fields.begin(), fields.end(), arg);
+  for (const auto& field_ : fields)
+  {
+    if (field_.type()->is_map())
+    {
+      m_src << sep() << param(field_.name()) << "_k";
+      m_src << sep() << param(field_.name()) << "_v";
+    }
+    else
+    {
+      m_src << sep() << param(field_.name());
+    }
+  }
   m_src << ") result(self)" << std::endl << indent;
-  std::for_each(fields.begin(), fields.end(), dec);
+  for (const auto& field_ : fields)
+  {
+    arg = param(field_.name());
+    if (field_.type()->is_map())
+    {
+      auto as_map = std::dynamic_pointer_cast<state::map>(field_.type());
+      auto key_type = translate(as_map->key_type());
+      auto value_type = translate(as_map->value_type());
+      m_src << tab << key_type->in() << ", dimension(:), intent(in) :: " << arg << "_k" << std::endl;
+      m_src << tab << value_type->in() << ", dimension(:), intent(in) :: " << arg << "_v" << std::endl;
+    }
+    else
+    {
+      type = translate(field_.type());
+      m_src << tab << type->in() << ", intent(in) :: " << arg << std::endl;
+    }
+  }
   m_src << tab << "type(" << name << ") :: self" << std::endl;
   m_src << std::endl;
-  std::for_each(fields.begin(), fields.end(), set);
+  for (const auto& field_ : fields)
+  {
+    arg = param(field_.name());
+    var = member(field_.name());
+    if (field_.type()->is_string())
+    {
+      m_src << tab << "allocate(self%" << var << "(len(" << arg << ")))" << std::endl;
+    }
+    else if (field_.type()->is_map())
+    {
+      m_src << tab << "allocate(self%" << var << "_k(size(" << arg << "_k)))" << std::endl;
+      m_src << tab << "allocate(self%" << var << "_v(size(" << arg << "_v)))" << std::endl;
+    }
+    else if (field_.type()->is_set() || field_.type()->is_vector())
+    {
+      m_src << tab << "allocate(self%" << var << "(size(" << arg << ")))" << std::endl;
+    }
+  }
+  for (const auto& field_ : fields)
+  {
+    arg = param(field_.name());
+    var = "self%" + member(field_.name());
+    if (field_.type()->is_map())
+    {
+      m_src << tab << var << "_k = " << arg << "_k" << std::endl;
+      m_src << tab << var << "_v = " << arg << "_v" << std::endl;
+    }
+    else
+    {
+      m_src << tab << var << " = " << arg << std::endl;
+    }
+  }
   m_src << unindent << tab << "end function" << std::endl << std::endl;
 }
 
@@ -554,16 +720,65 @@ generator::getter(const std::string& a_structure, const state::field& a_field)
 {
   std::string name = a_field.name();
   pointer type = translate(a_field.type());
+  std::string arg = param(name);
+  std::string var = "self%" + member(name);
 
-  m_src << tab << "function " << a_structure << "_get_" << name;
-  m_src << "(self) result(" << name << ")" << std::endl;
-  m_src << indent;
-  m_src << tab << "class(" << a_structure << ") :: self" << std::endl;
-  m_src << tab << type->out() << " :: " << name << std::endl;
-  m_src << std::endl;
-  m_src << tab << name << " = self%" << member(name) << std::endl;
-  m_src << unindent;
-  m_src << tab << "end function" << std::endl << std::endl;
+  if (a_field.type()->is_map())
+  {
+    auto as_map = std::dynamic_pointer_cast<state::map>(a_field.type());
+    auto key_type = translate(as_map->key_type());
+    auto value_type = translate(as_map->value_type());
+    m_src << tab << "function " << a_structure << "_get_" << name;
+    m_src << "(self, " << arg << ") result(" << name << ")" << std::endl;
+    m_src << indent;
+    m_src << tab << "class(" << a_structure << ") :: self" << std::endl;
+    m_src << tab << key_type->in() << ", intent(in) :: " << arg << std::endl;
+    m_src << tab << value_type->out() << " :: " << name << std::endl;
+    m_src << std::endl;
+    m_src << unindent;
+    m_src << tab << "end function" << std::endl << std::endl;
+  }
+  else if (a_field.type()->is_set())
+  {
+    auto as_set = std::dynamic_pointer_cast<state::set>(a_field.type());
+    auto key_type = translate(as_set->key_type());
+    m_src << tab << "function " << a_structure << "_count_" << name;
+    m_src << "(self, " << arg << ") result(" << name << ")" << std::endl;
+    m_src << indent;
+    m_src << tab << "class(" << a_structure << ") :: self" << std::endl;
+    m_src << tab << key_type->in() << " :: " << arg << std::endl;
+    m_src << tab << "integer(kind = c_size_t) :: " << name << std::endl;
+    m_src << std::endl;
+    m_src << unindent;
+    m_src << tab << "end function" << std::endl << std::endl;
+  }
+  else if (a_field.type()->is_vector())
+  {
+    auto as_vector = std::dynamic_pointer_cast<state::vector>(a_field.type());
+    auto value_type = translate(as_vector->value_type());
+    m_src << tab << "function " << a_structure << "_get_" << name;
+    m_src << "(self, a_pos) result(" << name << ")" << std::endl;
+    m_src << indent;
+    m_src << tab << "class(" << a_structure << ") :: self" << std::endl;
+    m_src << tab << "integer(kind = c_size_t), intent(in) :: a_pos" << std::endl;
+    m_src << tab << value_type->out() << " :: " << name << std::endl;
+    m_src << std::endl;
+    m_src << tab << name << " = " << var << "(a_pos)" << std::endl;
+    m_src << unindent;
+    m_src << tab << "end function" << std::endl << std::endl;
+  }
+  else
+  {
+    m_src << tab << "function " << a_structure << "_get_" << name;
+    m_src << "(self) result(" << name << ")" << std::endl;
+    m_src << indent;
+    m_src << tab << "class(" << a_structure << ") :: self" << std::endl;
+    m_src << tab << type->out() << " :: " << name << std::endl;
+    m_src << std::endl;
+    m_src << tab << name << " = " << var << std::endl;
+    m_src << unindent;
+    m_src << tab << "end function" << std::endl << std::endl;
+  }
 }
 
 void
@@ -571,14 +786,133 @@ generator::setter(const std::string& a_structure, const state::field& a_field)
 {
   std::string name = a_field.name();
   pointer type = translate(a_field.type());
+  std::string arg = param(name);
+  std::string var = "self%" + member(name);
 
-  m_src << tab << "subroutine " << a_structure << "_set_" << name;
-  m_src << "(self, " << param(name) << ")" << std::endl;
+  if (a_field.type()->is_map())
+  {
+    auto as_map = std::dynamic_pointer_cast<state::map>(a_field.type());
+    auto key_type = translate(as_map->key_type());
+    auto value_type = translate(as_map->value_type());
+    m_src << tab << "subroutine " << a_structure << "_insert_" << name;
+    m_src << "(self, " << arg << "_k, " << arg << "_v)" << std::endl;
+    m_src << indent;
+    m_src << tab << "class(" << a_structure << ") :: self" << std::endl;
+    m_src << tab << key_type->in() << ", intent(in) :: " << arg << "_k" << std::endl;
+    m_src << tab << value_type->in() << ", intent(in) :: " << arg << "_v" << std::endl;
+    m_src << std::endl;
+    m_src << unindent;
+    m_src << tab << "end subroutine" << std::endl << std::endl;
+  }
+  else if (a_field.type()->is_set())
+  {
+    auto as_set = std::dynamic_pointer_cast<state::set>(a_field.type());
+    auto key_type = translate(as_set->key_type());
+    m_src << tab << "subroutine " << a_structure << "_insert_" << name;
+    m_src << "(self, " << arg << ")" << std::endl;
+    m_src << indent;
+    m_src << tab << "class(" << a_structure << ") :: self" << std::endl;
+    m_src << tab << key_type->in() << ", intent(in) :: " << arg << std::endl;
+    m_src << std::endl;
+    m_src << unindent;
+    m_src << tab << "end subroutine" << std::endl << std::endl;
+  }
+  else if (a_field.type()->is_vector())
+  {
+    auto as_vector = std::dynamic_pointer_cast<state::vector>(a_field.type());
+    auto value_type = translate(as_vector->value_type());
+    m_src << tab << "subroutine " << a_structure << "_set_" << name;
+    m_src << "(self, a_pos, " << arg << ")" << std::endl;
+    m_src << indent;
+    m_src << tab << "class(" << a_structure << ") :: self" << std::endl;
+    m_src << tab << "integer(kind = c_size_t), intent(in) :: a_pos" << std::endl;
+    m_src << tab << value_type->in() << ", intent(in) :: " << arg << std::endl;
+    m_src << std::endl;
+    m_src << tab << var << "(a_pos) = " << arg << std::endl;
+    m_src << unindent;
+    m_src << tab << "end subroutine" << std::endl << std::endl;
+  }
+  else
+  {
+    m_src << tab << "subroutine " << a_structure << "_set_" << name;
+    m_src << "(self, " << arg << ")" << std::endl;
+    m_src << indent;
+    m_src << tab << "class(" << a_structure << ") :: self" << std::endl;
+    m_src << tab << type->out() << ", intent(in) :: " << arg << std::endl;
+    m_src << std::endl;
+    m_src << tab << var << " = " << arg << std::endl;
+    m_src << unindent;
+    m_src << tab << "end subroutine" << std::endl << std::endl;
+  }
+}
+
+void
+generator::size(const std::string& a_structure, const state::field& a_field)
+{
+  std::string name = a_field.name();
+  std::string var = "self%" + member(name);
+
+  if (a_field.type()->is_map())
+  {
+    var += "_k";
+  }
+
+  m_src << tab << "function " << a_structure << "_size_" << name;
+  m_src << "(self) result(n)" << std::endl;
   m_src << indent;
   m_src << tab << "class(" << a_structure << ") :: self" << std::endl;
-  m_src << tab << type->out() << ", intent(in) :: " << param(name) << std::endl;
+  m_src << tab << "integer(kind = c_size_t) :: n" << std::endl;
   m_src << std::endl;
-  m_src << tab << "self%" << member(name) << " = " << param(name) << std::endl;
+  m_src << tab << "n = size(" << var << ")" << std::endl;
+  m_src << unindent;
+  m_src << tab << "end function" << std::endl << std::endl;
+}
+
+void
+generator::resizer(const std::string& a_structure, const state::field& a_field)
+{
+  std::string name = a_field.name();
+  std::string var = "self%" + member(name);
+
+  m_src << tab << "subroutine " << a_structure << "_resize_" << name;
+  m_src << "(self, a_size)" << std::endl;
+  m_src << indent;
+  m_src << tab << "class(" << a_structure << ") :: self" << std::endl;
+  m_src << tab << "integer(kind = c_size_t), intent(in) :: a_size" << std::endl;
+  m_src << std::endl;
+  if (a_field.type()->is_map())
+  {
+    m_src << tab << "allocate(" << var << "_k(a_size))" << std::endl;
+    m_src << tab << "allocate(" << var << "_v(a_size))" << std::endl;
+  }
+  else
+  {
+    m_src << tab << "allocate(" << var << "(a_size))" << std::endl;
+  }
+  m_src << unindent;
+  m_src << tab << "end subroutine" << std::endl << std::endl;
+}
+
+void
+generator::clearer(const std::string& a_structure, const state::field& a_field)
+{
+  std::string name = a_field.name();
+  std::string var = "self%" + member(name);
+
+  m_src << tab << "subroutine " << a_structure << "_clear_" << name;
+  m_src << "(self)" << std::endl;
+  m_src << indent;
+  m_src << tab << "class(" << a_structure << ") :: self" << std::endl;
+  m_src << std::endl;
+  if (a_field.type()->is_map())
+  {
+    m_src << tab << "deallocate(" << var << "_k)" << std::endl;
+    m_src << tab << "deallocate(" << var << "_v)" << std::endl;
+  }
+  else
+  {
+    m_src << tab << "deallocate(" << var << ")" << std::endl;
+  }
   m_src << unindent;
   m_src << tab << "end subroutine" << std::endl << std::endl;
 }
@@ -621,15 +955,42 @@ void
 generator::archive(const field_vector& a_fields, bool a_input)
 {
   bool first = true;
-  m_src << tab << "status = ";
   for (const state::field& f : a_fields)
   {
-    m_src << (first ? "" : " .and. ");
-    m_src << "a_archive%" << category(f.type(), a_input);
-    m_src << "(self%" << member(f.name()) << ")";
+    if (f.type()->is_map())
+    {
+      auto as_map = std::dynamic_pointer_cast<state::map>(f.type());
+      auto key_type = std::make_shared<state::vector>(as_map->key_type());
+      auto value_type = std::make_shared<state::vector>(as_map->value_type());
+      archive(f.name() + "_k", key_type, a_input, first);
+      archive(f.name() + "_v", value_type, a_input, false);
+    }
+    else
+    {
+      archive(f.name(), f.type(), a_input, first);
+    }
     first = false;
   }
   m_src << std::endl;
+}
+
+void
+generator::archive(const std::string& a_name,
+                   std::shared_ptr<state::datatype> a_type,
+                   bool a_input,
+                   bool a_first)
+{
+  auto var = "self%" + member(a_name);
+  auto method = "a_archive%" + category(a_type, a_input);
+  if (a_first)
+  {
+    m_src << tab << "status = ";
+  }
+  else
+  {
+    m_src << " .and. &" << std::endl << tab << "         ";
+  }
+  m_src << method << "(" << var << ")";
 }
 
 void
