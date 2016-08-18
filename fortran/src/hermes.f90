@@ -370,6 +370,7 @@ contains
     integer(kind = c_int32_t) :: n
     integer(kind = c_int32_t) :: length
 
+    status = .true.
     length = size(a_objects)
     do n = 1, length
       status = status .and. self%value(a_objects(n))
@@ -384,6 +385,7 @@ contains
     integer(kind = c_int32_t) :: n
     integer(kind = c_int32_t) :: length
 
+    status = .true.
     length = size(a_objects)
     do n = 1, length
       status = status .and. self%unsigned(a_objects(n))
@@ -398,6 +400,7 @@ contains
     integer(kind = c_int32_t) :: n
     integer(kind = c_int32_t) :: length
 
+    status = .true.
     length = size(a_values)
     do n = 1, length
       status = status .and. self%character(a_values(n))
