@@ -686,7 +686,7 @@ generator::constructor(std::shared_ptr<state::structure> a_structure)
     var = member(field_.name());
     if (field_.type()->is_string())
     {
-      m_src << tab << "allocate(self%" << var << "(len(" << arg << ")))" << std::endl;
+      m_src << tab << "allocate(character(kind = c_char, len = len(" << arg << ")) :: self%" << var << ")" << std::endl;
     }
     else if (field_.type()->is_map())
     {
@@ -1070,8 +1070,9 @@ generator::code_call(const std::string& a_interface,
   auto name = a_procedure.name();
   auto params = a_procedure.parameters();
   auto result = a_procedure.result();
-  bool is_void = a_procedure.result()->is_void();
-  bool is_string = a_procedure.result()->is_string();
+  bool is_void = result->is_void();
+  bool is_string = result->is_string();
+  bool is_container = result->is_map() || result->is_set() || result->is_vector();
   auto func_name = a_interface + "_client_" + name + "_code";
 
   auto sep = [&](){ if (!first) return ", "; first = false; return ""; };
@@ -1107,7 +1108,11 @@ generator::code_call(const std::string& a_interface,
 
   m_src << tab << "logical :: status" << std::endl;
   m_src << tab << "type(reply_header) :: header" << std::endl;
-  if (!is_void && !is_string)
+  if (is_container)
+  {
+    m_src << tab << "class(*), dimension(:), pointer :: ptr" << std::endl;
+  }
+  else if (!is_void && !is_string)
   {
     m_src << tab << "class(*), pointer :: ptr" << std::endl;
   }
@@ -1261,6 +1266,7 @@ generator::server_handler(const std::string& a_interface,
   auto first = true;
   auto is_void = result->is_void();
   auto is_string = result->is_string();
+  auto is_container = result->is_map() || result->is_set() || result->is_vector();
   auto is_call = is_void || is_string;
 
   auto sep = [&](){ if (!first) return ", "; first = false; return ""; };
@@ -1275,9 +1281,16 @@ generator::server_handler(const std::string& a_interface,
   }
   if (!is_void)
   {
-    m_src << tab << "integer(kind = c_size_t) :: size" << std::endl;
+    m_src << tab << "integer(kind = c_size_t) :: result_size" << std::endl;
     m_src << tab << result_type->target() << " :: r" << std::endl;
-    m_src << tab << "class(*), pointer :: ptr" << std::endl;
+    if (is_container)
+    {
+      m_src << tab << "class(*), dimension(:), pointer :: ptr" << std::endl;
+    }
+    else
+    {
+      m_src << tab << "class(*), pointer :: ptr" << std::endl;
+    }
   }
   if (!params.empty())
   {
@@ -1313,10 +1326,10 @@ generator::server_handler(const std::string& a_interface,
   }
   else
   {
-    m_src << tab << sizevar("size", get_size("r", result_type));
+    m_src << tab << sizevar("result_size", get_size("r", result_type));
     m_src << tab << "ptr => r" << std::endl;
     m_src << tab << "call self%reply_with_result_";
-    m_src << category(result, false) << "(ptr, size)" << std::endl;
+    m_src << category(result, false) << "(ptr, result_size)" << std::endl;
   }
   m_src << unindent << unindent << tab << "end select" << std::endl;
   for (const auto& f : params)
@@ -1381,7 +1394,17 @@ generator::server_request(const std::string& a_interface,
   for (const auto& f : params)
   {
     type = translate(f.type());
-    if (type->allocatable() && !f.type()->is_string())
+    bool is_string = f.type()->is_string();
+    if (f.type()->is_alias())
+    {
+      auto as_alias = std::dynamic_pointer_cast<state::alias>(f.type());
+      auto root = as_alias->root_type();
+      if (root->is_string())
+      {
+        is_string = true;
+      }
+    }
+    if (type->allocatable() && !is_string)
     {
       m_src << tab << "status = archive%length(length)" << std::endl;
       m_src << tab << "allocate(" << param(f.name()) << "(length))" << std::endl;

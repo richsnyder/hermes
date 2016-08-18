@@ -212,7 +212,7 @@ real64::size(const std::string& a_variable) const
 std::string
 string::in() const
 {
-  return "character(kind = c_char, len = *)";
+  return "character(kind = c_char, len = :), allocatable";
 }
 
 std::string
