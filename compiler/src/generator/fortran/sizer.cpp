@@ -170,11 +170,8 @@ sizer::conversion_visitor::operator()(const std::string& a_length,
   }
   else
   {
-    m_out << m_header << " + [&](){ std::size_t " << sum << " = 0;";
-    m_out << " for (const auto& " << var << " : " << m_name << ") { ";
-    m_out << sum << " += ";
-    boost::apply_visitor(visitor, a_content->m_length, a_content->m_content);
-    m_out << "; } return " << sum << "; }()";
+    // TBD
+    m_out << "1024";
   }
 }
 
@@ -182,13 +179,25 @@ std::string
 sizer::conversion_visitor::format(const std::string& a_template,
                                   const std::string& a_name) const
 {
-  std::string result = a_template;
-  std::size_t pos = result.find("{}");
-  if (pos != std::string::npos)
+  std::regex get_regex("get");
+  std::regex braces_regex("\\{([^\\}]*)\\}");
+  std::regex brackets_regex("\\[([^\\]]*)\\]");
+  std::smatch match;
+  if (std::regex_search(a_template, match, brackets_regex))
   {
-    result.replace(pos, 2, a_name);
+    if (std::regex_search(a_name, get_regex))
+    {
+      return std::regex_replace(a_name, get_regex, "size");
+    }
+    else
+    {
+      return std::regex_replace(match.str(1), braces_regex, a_name);
+    }
   }
-  return result;
+  else
+  {
+    return std::regex_replace(a_template, braces_regex, a_name);
+  }
 }
 
 } // fortran namespace

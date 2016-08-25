@@ -33,7 +33,7 @@ alias::pack(std::ostream& a_out, const std::string& a_variable) const
 void
 alias::unpack(std::ostream& a_out, const std::string& a_variable) const
 {
-  m_type->pack(a_out, a_variable);
+  m_type->unpack(a_out, a_variable);
 }
 
 } // python namespace

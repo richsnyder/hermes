@@ -17,6 +17,12 @@ datatype::target() const
   return out() + ", target";
 }
 
+std::string
+datatype::member() const
+{
+  return in();
+}
+
 bool
 datatype::allocatable() const
 {
