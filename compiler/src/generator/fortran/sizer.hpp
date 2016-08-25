@@ -2,6 +2,7 @@
 #define HERMES_COMPILER_GENERATOR_FORTRAN_SIZER_HPP
 
 #include <memory>
+#include <regex>
 #include <sstream>
 #include <boost/variant.hpp>
 

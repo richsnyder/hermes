@@ -15,6 +15,9 @@ public:
   container() = default;
   container(const container&) = delete;
   container& operator=(const container&) = delete;
+
+  std::string member() const;
+  bool allocatable() const;
 };
 
 class map : public container
@@ -53,7 +56,6 @@ public:
 
   std::string in() const;
   std::string out() const;
-  bool allocatable() const;
   std::set<std::string> iso_c_symbols() const;
   std::set<std::string> structures() const;
   std::shared_ptr<sizer> size(const std::string& a_variable) const;
@@ -75,7 +77,6 @@ public:
 
   std::string in() const;
   std::string out() const;
-  bool allocatable() const;
   std::set<std::string> iso_c_symbols() const;
   std::set<std::string> structures() const;
   std::shared_ptr<sizer> size(const std::string& a_variable) const;

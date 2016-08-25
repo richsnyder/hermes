@@ -61,12 +61,17 @@ protected:
   void private_procedure(const std::string& a_name);
   void deferred_procedure(const std::string& a_type, const std::string& a_name);
   void private_member(const state::field& a_field);
+  void private_member(const state::field& a_field, const std::string& a_suffix);
   void constructor(std::shared_ptr<state::structure> a_structure);
   void getter(const std::string& a_structure, const state::field& a_field);
   void setter(const std::string& a_structure, const state::field& a_field);
+  void size(const std::string& a_structure, const state::field& a_field);
+  void resizer(const std::string& a_structure, const state::field& a_field);
+  void clearer(const std::string& a_structure, const state::field& a_field);
   void reader(std::shared_ptr<state::structure> a_structure);
   void writer(std::shared_ptr<state::structure> a_structure);
   void archive(const field_vector& a_fields, bool a_input);
+  void archive(const std::string& a_name, std::shared_ptr<state::datatype> a_type, bool a_input, bool a_first);
   void base_call(const std::string& a_interface, const state::procedure& a_procedure);
   void code_call(const std::string& a_interface, const state::procedure& a_procedure);
   void client_request(const std::string& a_interface, const state::procedure& a_procedure, int a_id);
