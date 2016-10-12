@@ -1,6 +1,6 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.1.0 FATAL_ERROR)
 
-PROJECT(hermes LANGUAGES CXX VERSION 0.2.0)
+PROJECT(hermes LANGUAGES CXX VERSION 0.2.2)
 
 # Add custom modules to the module search path and mark them for installation.
 
