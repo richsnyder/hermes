@@ -50,6 +50,8 @@ protected:
     }
   };
 public:
+  static const int SIZE_LIMIT = 0x1000000;
+
   iarchive(void* a_data, size_t a_size);
   ~iarchive();
 
@@ -76,7 +78,7 @@ public:
     std::uint32_t n;
     std::uint32_t l_map;
     int code = xdr_u_int(&m_xdr, &l_map);
-    if (code == 0 || l_map > 65535)
+    if (code == 0 || l_map > SIZE_LIMIT)
     {
       return false;
     }
@@ -96,7 +98,7 @@ public:
     std::uint32_t n;
     std::uint32_t l_set;
     int code = xdr_u_int(&m_xdr, &l_set);
-    if (code == 0 || l_set > 65535)
+    if (code == 0 || l_set > SIZE_LIMIT)
     {
       return false;
     }
@@ -114,7 +116,7 @@ public:
     std::uint32_t n;
     std::uint32_t l_vector;
     int code = xdr_u_int(&m_xdr, &l_vector);
-    if (code == 0 || l_vector > 65535)
+    if (code == 0 || l_vector > SIZE_LIMIT)
     {
       return false;
     }

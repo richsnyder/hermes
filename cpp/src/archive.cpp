@@ -102,14 +102,14 @@ iarchive::operator()(std::string& a_value)
   std::uint32_t l_value;
   u_int pos = xdr_getpos(&m_xdr);
   int code = xdr_u_int(&m_xdr, &l_value);
-  if (code == 0 || l_value > 65535)
+  if (code == 0 || l_value > SIZE_LIMIT)
   {
     return false;
   }
   a_value.resize(l_value);
   code = xdr_setpos(&m_xdr, pos);
   char* p_value = const_cast<char*>(a_value.data());
-  code = xdr_string(&m_xdr, &p_value, 65536);
+  code = xdr_string(&m_xdr, &p_value, SIZE_LIMIT + 1);
   return static_cast<bool>(code);
 }
 
@@ -120,7 +120,7 @@ iarchive::operator()(std::vector<bool>& a_vector)
   std::uint32_t n;
   std::uint32_t l_vector;
   int code = xdr_u_int(&m_xdr, &l_vector);
-  if (code == 0 || l_vector > 65535)
+  if (code == 0 || l_vector > SIZE_LIMIT)
   {
     return false;
   }
