@@ -1297,7 +1297,7 @@ generator::server_handler(const std::string& a_interface,
     m_src << std::endl;
   }
 
-  if (!is_void)
+  if (!params.empty())
   {
     first = true;
     m_src << tab << "call self%request_" << name << "(";
@@ -1432,9 +1432,11 @@ generator::server_throw(const std::string& a_interface,
   m_src << tab << "class(" << cname << ") :: self" << std::endl;
   m_src << tab << "type(" << name << "), pointer, intent(in) :: a_exception" << std::endl;
   m_src << std::endl;
-  m_src << tab << "integer(kind = c_size_t) :: size" << std::endl << std::endl;
+  m_src << tab << "integer(kind = c_size_t) :: size" << std::endl;
+  m_src << tab << "class(serializable), pointer :: exception" << std::endl << std::endl;
   m_src << tab << sizevar("size", get_size("a_exception", type));
-  m_src << tab << "call self%throw_exception(a_exception, " << a_id << ", size)" << std::endl;
+  m_src << tab << "exception => a_exception" << std::endl;
+  m_src << tab << "call self%throw_exception(exception, " << a_id << ", size)" << std::endl;
   m_src << unindent;
   m_src << tab << "end subroutine" << std::endl;
 }
