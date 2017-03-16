@@ -58,7 +58,7 @@ to_camel(const std::string& a_label)
     else if (up)
     {
       up = false;
-      label += std::toupper(c);
+      label += ::toupper(c);
     }
     else
     {
