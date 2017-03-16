@@ -1,6 +1,7 @@
 #ifndef HERMES_COMPILER_GENERATOR_UTILITIES_HPP
 #define HERMES_COMPILER_GENERATOR_UTILITIES_HPP
 
+#include <cctype>
 #include <cmath>
 #include <iomanip>
 #include <sstream>
