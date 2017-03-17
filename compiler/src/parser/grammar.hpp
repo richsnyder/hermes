@@ -7,6 +7,7 @@
 #include "parser/datatype.hpp"
 #include "parser/enumeration.hpp"
 #include "parser/exception.hpp"
+#include "parser/import.hpp"
 #include "parser/interface.hpp"
 #include "parser/space.hpp"
 #include "parser/structure.hpp"
@@ -20,6 +21,7 @@ struct components : sor<
     constant,
     enumeration,
     exception,
+    import,
     interface,
     space,
     structure

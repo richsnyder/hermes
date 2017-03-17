@@ -49,11 +49,15 @@ generator::close()
 void
 generator::write_header()
 {
+  using namespace std::placeholders;
+  auto imports = m_blueprint->imports();
+  auto write_use = std::bind(&generator::use_import, this, _1);
   m_src << tab << "module " << m_project << indent << std::endl << std::endl;
   m_src << tab << "use, intrinsic :: iso_c_binding" << std::endl;
   m_src << tab << "use :: hermes" << std::endl;
   m_src << tab << "use :: uint" << std::endl;
   m_src << tab << "use :: zmq" << std::endl;
+  std::for_each(imports.begin(), imports.end(), write_use);
   m_src << tab << "implicit none" << std::endl;
   m_src << tab << "private" << std::endl << std::endl;
 }
@@ -160,6 +164,13 @@ void
 generator::write_footer()
 {
   m_src << unindent << tab << "end module" << std::endl;
+}
+
+void
+generator::use_import(std::pair<std::string,
+                      std::shared_ptr<state::blueprint>> a_import)
+{
+  m_src << tab << "use :: " << stem(a_import.first) << std::endl;
 }
 
 void

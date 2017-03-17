@@ -56,6 +56,10 @@ generator::write_header()
   m_hpp << "#ifndef " << guard << std::endl;
   m_hpp << "#define " << guard << std::endl << std::endl;
   m_hpp << "#include <hermes.hpp>" << std::endl << std::endl;
+  for (auto import : m_blueprint->imports())
+  {
+    m_hpp << "#include \"" << stem(import.first) << ".hpp\"" << std::endl;
+  }
   m_cpp << "#include \"" << m_hpp_path << "\"" << std::endl << std::endl;
   for (auto part = parts.begin(); part != parts.end(); ++part)
   {
