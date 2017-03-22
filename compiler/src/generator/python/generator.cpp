@@ -49,7 +49,7 @@ generator::write_header()
   m_py << tab << "import xdrlib" << endl;
   for (auto import : m_blueprint->imports())
   {
-    m_py << tab << "import " << stem(import.first) << endl;
+    m_py << tab << "from " << stem(import.first) << " import *" << endl;
   }
   m_py << endl;
 }

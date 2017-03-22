@@ -104,6 +104,7 @@ private:
   std::string m_project;
   std::string m_hpp_path;
   std::string m_cpp_path;
+  std::string m_directory;
   std::ofstream m_hpp;
   std::ofstream m_cpp;
   const state::blueprint* m_blueprint;

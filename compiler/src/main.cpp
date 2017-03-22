@@ -13,6 +13,7 @@ int main(int a_argc, char* a_argv[])
   bool language_python;
   std::string output_directory;
   std::vector<std::string> input_files;
+  std::vector<std::string> import_paths;
 
   try
   {
@@ -20,6 +21,7 @@ int main(int a_argc, char* a_argv[])
     language_cpp = program_options.cpp();
     language_fortran = program_options.fortran();
     language_python = program_options.python();
+    import_paths = program_options.import_paths();
     output_directory = program_options.output_directory();
     input_files = program_options.input_files();
   }
@@ -37,7 +39,7 @@ int main(int a_argc, char* a_argv[])
 
     for (auto file : input_files)
     {
-      hermes::compiler::state::blueprint blueprint;
+      hermes::compiler::state::blueprint blueprint(import_paths);
       hermes::compiler::parser::file_parser parser(file);
       parser.parse<grammar, action, control>(blueprint);
       std::string stem = hermes::compiler::generator::stem(file);

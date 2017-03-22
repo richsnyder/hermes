@@ -15,6 +15,7 @@ void
 generator::open(const std::string& a_project, const std::string& a_directory)
 {
   m_project = a_project;
+  m_directory = a_directory;
   m_hpp_path = a_directory + "/" + a_project + ".hpp";
   m_cpp_path = a_directory + "/" + a_project + ".cpp";
   m_hpp.open(m_hpp_path);
@@ -58,7 +59,8 @@ generator::write_header()
   m_hpp << "#include <hermes.hpp>" << std::endl << std::endl;
   for (auto import : m_blueprint->imports())
   {
-    m_hpp << "#include \"" << stem(import.first) << ".hpp\"" << std::endl;
+    m_hpp << "#include \"" << m_directory << "/" << stem(import.first);
+    m_hpp << ".hpp\"" << std::endl;
   }
   m_cpp << "#include \"" << m_hpp_path << "\"" << std::endl << std::endl;
   for (auto part = parts.begin(); part != parts.end(); ++part)

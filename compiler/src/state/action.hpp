@@ -307,7 +307,7 @@ struct action<parser::import::end>
 {
   static void apply(const parser::input& a_input, blueprint& a_blueprint)
   {
-    auto filename = a_blueprint.token();
+    auto filename = a_blueprint.filename();
     parser::file_parser parser_(filename);
     auto import = std::make_shared<blueprint>();
     parser_.parse<parser::grammar, import_action, parser::control>(*import);

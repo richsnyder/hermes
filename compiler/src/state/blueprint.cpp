@@ -1,12 +1,19 @@
 #include "state/blueprint.hpp"
 
-// DEBUG BEGIN
-#include <iostream>
-// DEBUG END
-
 namespace hermes {
 namespace compiler {
 namespace state {
+
+blueprint::blueprint()
+{
+  // empty
+}
+
+blueprint::blueprint(const std::vector<std::string>& a_import_paths)
+: m_import_paths(a_import_paths)
+{
+  //
+}
 
 const std::set<space>&
 blueprint::spaces() const
@@ -121,6 +128,26 @@ blueprint::token()
   std::string tok = m_tokens.top();
   m_tokens.pop();
   return tok;
+}
+
+std::string
+blueprint::filename()
+{
+  std::string file = token();
+  std::string path;
+  std::ifstream in;
+
+  for (auto dir : m_import_paths)
+  {
+    path = dir + "/" + file;
+    in.open(path);
+    if (in.is_open())
+    {
+      return path;
+    }
+  }
+
+  return file;
 }
 
 void

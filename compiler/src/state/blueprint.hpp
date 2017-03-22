@@ -2,6 +2,7 @@
 #define HERMES_COMPILER_STATE_BLUEPRINT_HPP
 
 #include <cassert>
+#include <fstream>
 #include <map>
 #include <memory>
 #include <set>
@@ -31,6 +32,9 @@ class blueprint
 public:
   typedef std::shared_ptr<datatype> pointer;
 
+  blueprint();
+  blueprint(const std::vector<std::string>& a_import_paths);
+
   const std::set<space>& spaces() const;
   const std::set<constant>& constants() const;
   const std::set<interface>& interfaces() const;
@@ -44,6 +48,7 @@ public:
   std::string get_space(const std::string& a_name) const;
 protected:
   std::string token();
+  std::string filename();
   void token(const std::string& a_identifier);
 
   pointer type();
@@ -68,6 +73,8 @@ protected:
   void store_enumeration();
   void store_interface();
 private:
+  std::vector<std::string> m_import_paths;
+
   std::stack<std::string> m_tokens;
   std::stack<pointer> m_datatypes;
   std::shared_ptr<enumeration> m_working_enumeration;
