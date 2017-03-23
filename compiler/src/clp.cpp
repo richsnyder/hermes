@@ -8,6 +8,7 @@ clp::clp(int a_argc, char* a_argv[])
   , m_language_cpp("", "cpp", "C++")
   , m_language_fortran("", "fortran", "Fortran")
   , m_language_python("", "python", "Python")
+  , m_import_paths("", "import-path", "import path", false, "-")
   , m_output_directory("", "destination", "output directory", false, ".", "-")
   , m_input_files("file", "input file(s)", true, "-")
   , m_command_line("Hermes command line tool", '=', HERMES_VERSION)
@@ -16,6 +17,7 @@ clp::clp(int a_argc, char* a_argv[])
   m_command_line.add(m_language_cpp);
   m_command_line.add(m_language_fortran);
   m_command_line.add(m_language_python);
+  m_command_line.add(m_import_paths);
   m_command_line.add(m_output_directory);
   m_command_line.add(m_input_files);
   m_command_line.parse(a_argc, a_argv);
@@ -40,6 +42,36 @@ clp::python() const
 {
   typedef TCLAP::SwitchArg type;
   return const_cast<type&>(m_language_python).getValue();
+}
+
+std::vector<std::string>
+clp::import_paths() const
+{
+  typedef TCLAP::MultiArg<std::string> type;
+  auto import_paths = const_cast<type&>(m_import_paths).getValue();
+
+  std::string::size_type pos;
+  std::string::size_type sep;
+  std::vector<std::string> paths = {"."};
+  for (const auto& path : import_paths)
+  {
+    pos = 0;
+    while (!path.empty())
+    {
+      sep = path.find(':', pos);
+      if (sep == std::string::npos)
+      {
+        paths.push_back(path.substr(pos));
+        break;
+      }
+      else
+      {
+        paths.push_back(path.substr(pos, sep - pos));
+        pos = sep + 1;
+      }
+    }
+  }
+  return paths;
 }
 
 std::string
@@ -75,6 +107,7 @@ clp::output::usage(interface_type& a_interface)
   cout << "  --cpp                 Generate C++ header and source." << endl;
   cout << "  --fortran             Generate Fortran source." << endl;
   cout << "  --python              Generate Python source." << endl;
+  cout << "  --import-path=<dir>   Search path for import statements." << endl;
   cout << "  --destination=<dir>   Destination directory (default: current directory)." << endl;
   cout << "  --version             Display version information and exit." << endl;
   cout << "  -h, --help            Display this help text and exit." << endl;

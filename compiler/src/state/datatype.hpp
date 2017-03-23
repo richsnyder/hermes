@@ -21,6 +21,7 @@ public:
   virtual bool is_container() const;
   virtual bool is_enumeration() const;
   virtual bool is_exception() const;
+  virtual bool is_forward() const;
   virtual bool is_structure() const;
 
   virtual bool is_bool() const;

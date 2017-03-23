@@ -47,6 +47,12 @@ datatype::is_exception() const
 }
 
 bool
+datatype::is_forward() const
+{
+  return false;
+}
+
+bool
 datatype::is_structure() const
 {
   return false;

@@ -20,7 +20,7 @@ enumeration::default_value() const
 void
 enumeration::pack(std::ostream& a_out, const std::string& a_variable) const
 {
-  a_out << tab << "xdr.pack_int(self." << a_variable << ")" << std::endl;
+  a_out << tab << "xdr.pack_int(" << a_variable << ")" << std::endl;
 }
 
 void

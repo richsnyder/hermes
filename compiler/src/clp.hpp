@@ -15,7 +15,10 @@ public:
   bool cpp() const;
   bool fortran() const;
   bool python() const;
+
+  std::vector<std::string> import_paths() const;
   std::string output_directory() const;
+
   const std::vector<std::string>& input_files() const;
 protected:
   class output : public TCLAP::StdOutput
@@ -33,6 +36,7 @@ private:
   TCLAP::SwitchArg m_language_cpp;
   TCLAP::SwitchArg m_language_fortran;
   TCLAP::SwitchArg m_language_python;
+  TCLAP::MultiArg<std::string> m_import_paths;
   TCLAP::ValueArg<std::string> m_output_directory;
   TCLAP::UnlabeledMultiArg<std::string> m_input_files;
   TCLAP::CmdLine m_command_line;
