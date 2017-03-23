@@ -42,6 +42,9 @@ protected:
   void write_server_methods();
   void write_footer();
 
+  void use_import(std::pair<std::string,
+                  std::shared_ptr<state::blueprint>> a_import);
+
   void structure_type(std::shared_ptr<state::structure> a_structure);
   void structure_interface(std::shared_ptr<state::structure> a_structure);
   void structure_procedures(std::shared_ptr<state::structure> a_structure);

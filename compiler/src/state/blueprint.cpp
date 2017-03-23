@@ -4,6 +4,17 @@ namespace hermes {
 namespace compiler {
 namespace state {
 
+blueprint::blueprint()
+{
+  // empty
+}
+
+blueprint::blueprint(const std::vector<std::string>& a_import_paths)
+: m_import_paths(a_import_paths)
+{
+  //
+}
+
 const std::set<space>&
 blueprint::spaces() const
 {
@@ -46,6 +57,12 @@ blueprint::aliases() const
   return m_aliases;
 }
 
+const std::map<std::string, std::shared_ptr<blueprint>>&
+blueprint::imports() const
+{
+  return m_imports;
+}
+
 blueprint::pointer
 blueprint::find(const std::string& a_name) const
 {
@@ -85,6 +102,15 @@ blueprint::find(const std::string& a_name) const
     }
   }
 
+  {
+    pointer match;
+    for (auto import : m_imports)
+    {
+      match = import.second->find(a_name);
+      if (match) return match;
+    }
+  }
+
   return nullptr;
 }
 
@@ -102,6 +128,26 @@ blueprint::token()
   std::string tok = m_tokens.top();
   m_tokens.pop();
   return tok;
+}
+
+std::string
+blueprint::filename()
+{
+  std::string file = token();
+  std::string path;
+  std::ifstream in;
+
+  for (auto dir : m_import_paths)
+  {
+    path = dir + "/" + file;
+    in.open(path);
+    if (in.is_open())
+    {
+      return path;
+    }
+  }
+
+  return file;
 }
 
 void
@@ -234,6 +280,15 @@ blueprint::make_exception()
   m_exceptions.insert(std::make_shared<exception>(token(), fields));
   assert(m_tokens.empty());
   assert(m_datatypes.empty());
+}
+
+void
+blueprint::make_import(const std::string& a_filename,
+                       std::shared_ptr<blueprint> a_blueprint)
+{
+  assert(m_tokens.empty());
+  assert(m_datatypes.empty());
+  m_imports.insert(std::make_pair(a_filename, a_blueprint));
 }
 
 void

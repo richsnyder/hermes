@@ -47,6 +47,10 @@ generator::write_header()
   using std::endl;
   m_py << tab << "import hermes" << endl;
   m_py << tab << "import xdrlib" << endl;
+  for (auto import : m_blueprint->imports())
+  {
+    m_py << tab << "from " << stem(import.first) << " import *" << endl;
+  }
   m_py << endl;
 }
 
