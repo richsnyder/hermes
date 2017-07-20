@@ -22,10 +22,10 @@ SET(cleanup_command ${CMAKE_COMMAND} -E remove_directory ${CMAKE_CURRENT_SOURCE_
 IF(Pip_FOUND)
   SET(wheel ${CMAKE_CURRENT_BINARY_DIR}/dist/hermes-${PROJECT_VERSION}-py2.py3-none-any.whl)
   SET(build_command ${PYTHON_EXECUTABLE} ${setup} bdist_wheel --universal)
-  SET(install_command ${Pip_EXECUTABLE} install ${wheel})
+  SET(install_command ${Pip_EXECUTABLE} install ${Pip_INSTALL_OPTIONS} ${wheel})
 ELSE()
   SET(build_command ${PYTHON_EXECUTABLE} ${setup} build)
-  SET(install_command ${PYTHON_EXECUTABLE} ${setup} install)
+  SET(install_command ${PYTHON_EXECUTABLE} ${setup} ${Pip_INSTALL_OPTIONS} install)
 ENDIF()
 
 ADD_CUSTOM_COMMAND(
