@@ -682,7 +682,7 @@ contains
   subroutine client_catch_exception(self, a_number, a_exception)
     class(client) :: self
     integer(kind = c_int32_t), intent(in) :: a_number
-    class(serializable), pointer, intent(in) :: a_exception
+    class(serializable), pointer, intent(inout) :: a_exception
 
     logical :: status
     type(c_ptr) :: msg_data
