@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include "json/json.hpp"
 #include "generator/generate.hpp"
 #include "parser/control.hpp"
 #include "parser/grammar.hpp"
@@ -14,6 +15,7 @@ int main(int a_argc, char* a_argv[])
   std::string output_directory;
   std::vector<std::string> input_files;
   std::vector<std::string> import_paths;
+  nlohmann::json language_options;
 
   try
   {
@@ -24,6 +26,12 @@ int main(int a_argc, char* a_argv[])
     import_paths = program_options.import_paths();
     output_directory = program_options.output_directory();
     input_files = program_options.input_files();
+
+    language_options = {
+      {"cpp", {}},
+      {"fortran", {}},
+      {"python", {{"numpy", program_options.use_numpy()}}}
+    };
   }
   catch (TCLAP::ArgException& e)
   {
@@ -43,18 +51,22 @@ int main(int a_argc, char* a_argv[])
       hermes::compiler::parser::file_parser parser(file);
       parser.parse<grammar, action, control>(blueprint);
       std::string stem = hermes::compiler::generator::stem(file);
+      nlohmann::json opts;
 
       if (language_cpp)
       {
-        generate("cpp", stem, output_directory, blueprint);
+        opts = language_options["cpp"];
+        generate("cpp", opts, stem, output_directory, blueprint);
       }
       if (language_fortran)
       {
-        generate("fortran", stem, output_directory, blueprint);
+        opts = language_options["fortran"];
+        generate("fortran", opts, stem, output_directory, blueprint);
       }
       if (language_python)
       {
-        generate("python", stem, output_directory, blueprint);
+        opts = language_options["python"];
+        generate("python", opts, stem, output_directory, blueprint);
       }
     }
   }

@@ -5,8 +5,9 @@ namespace compiler {
 namespace generator {
 namespace python {
 
-generator::generator()
+generator::generator(const nlohmann::json& a_options)
   : m_blueprint(nullptr)
+  , m_use_numpy(a_options["numpy"].get<bool>())
 {
   // empty
 }
@@ -41,10 +42,20 @@ generator::close()
   m_py.close();
 }
 
+bool
+generator::use_numpy() const
+{
+  return m_use_numpy;
+}
+
 void
 generator::write_header()
 {
   using std::endl;
+  if (use_numpy())
+  {
+    m_py << tab << "import numpy" << endl;
+  }
   m_py << tab << "import hermes" << endl;
   m_py << tab << "import xdrlib" << endl;
   for (auto import : m_blueprint->imports())
@@ -149,7 +160,7 @@ generator::reader(const field_vector& a_fields)
   {
     name = field_.name();
     type = translate(field_.type());
-    type->unpack(m_py, name);
+    type->unpack(m_py, name, use_numpy());
   }
   m_py << tab << "return " << ctor << endl;
   m_py << unindent;
@@ -170,7 +181,7 @@ generator::writer(const field_vector& a_fields)
   {
     name = "self." + field_.name();
     type = translate(field_.type());
-    type->pack(m_py, name);
+    type->pack(m_py, name, use_numpy());
   }
   m_py << unindent;
   m_py << endl;
@@ -267,7 +278,7 @@ generator::client_method(const state::procedure& a_procedure, int a_id)
   typedef const state::field& field_t;
 
   auto argument = [](ostream& out, field_t f){ out << f.name(); };
-  auto pack = [&](field_t p){ translate(p.type())->pack(m_py, p.name()); };
+  auto pack = [&](field_t p){ translate(p.type())->pack(m_py, p.name(), use_numpy()); };
 
   auto name = a_procedure.name();
   auto result = a_procedure.result();
@@ -307,7 +318,7 @@ generator::client_method(const state::procedure& a_procedure, int a_id)
   else
   {
     m_py << tab << "xdr = xdrlib.Unpacker(self.socket.recv())" << endl;
-    translate(result)->unpack(m_py, "result");
+    translate(result)->unpack(m_py, "result", use_numpy());
     m_py << tab << "return result" << endl;
   }
   m_py << unindent;
@@ -319,7 +330,7 @@ generator::client_method(const state::procedure& a_procedure, int a_id)
     m_py << tab << "elif header.number() == " << to_hex(eid) << ":" << endl;
     m_py << indent;
     m_py << tab << "xdr = xdrlib.Unpacker(self.socket.recv())" << endl;
-    translate(err)->unpack(m_py, "result");
+    translate(err)->unpack(m_py, "result", use_numpy());
     m_py << tab << "raise result" << endl;
     m_py << unindent;
   }
@@ -341,7 +352,7 @@ generator::server_method(const state::procedure& a_procedure, int a_id)
   typedef const state::field& field_t;
 
   auto argument = [](ostream& out, field_t f){ out << f.name(); };
-  auto unpack = [&](field_t p){ translate(p.type())->unpack(m_py, p.name()); };
+  auto unpack = [&](field_t p){ translate(p.type())->unpack(m_py, p.name(), use_numpy()); };
 
   auto name = a_procedure.name();
   auto result = a_procedure.result();
@@ -382,7 +393,7 @@ generator::server_method(const state::procedure& a_procedure, int a_id)
   {
     m_py << tab << "hermes.ReplyHeader.create(0x01, True).send(self.socket)" << endl;
     m_py << tab << "xdr = xdrlib.Packer()" << endl;
-    translate(result)->pack(m_py, "result");
+    translate(result)->pack(m_py, "result", use_numpy());
     m_py << tab << "self.socket.send(xdr.get_buffer())" << endl;
   }
   else
@@ -404,7 +415,7 @@ generator::server_method(const state::procedure& a_procedure, int a_id)
     m_py << indent;
     m_py << tab << "hermes.ReplyHeader.create(" << to_hex(reply_id) << ", True).send(self.socket)" << endl;
     m_py << tab << "xdr = xdrlib.Packer()" << endl;
-    type->pack(m_py, "err");
+    type->pack(m_py, "err", use_numpy());
     m_py << tab << "self.socket.send(xdr.get_buffer())" << endl;
     m_py << unindent;
   }

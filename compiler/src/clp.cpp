@@ -5,13 +5,14 @@ namespace compiler {
 
 clp::clp(int a_argc, char* a_argv[])
   : m_output()
+  , m_command_line("Hermes command line tool", '=', HERMES_VERSION)
   , m_language_cpp("", "cpp", "C++")
   , m_language_fortran("", "fortran", "Fortran")
   , m_language_python("", "python", "Python")
   , m_import_paths("", "import-path", "import path", false, "-")
   , m_output_directory("", "destination", "output directory", false, ".", "-")
   , m_input_files("file", "input file(s)", true, "-")
-  , m_command_line("Hermes command line tool", '=', HERMES_VERSION)
+  , m_python_use_numpy("", "numpy", "use numpy arrays instead of Python lists")
 {
   m_command_line.setOutput(&m_output);
   m_command_line.add(m_language_cpp);
@@ -20,6 +21,7 @@ clp::clp(int a_argc, char* a_argv[])
   m_command_line.add(m_import_paths);
   m_command_line.add(m_output_directory);
   m_command_line.add(m_input_files);
+  m_command_line.add(m_python_use_numpy);
   m_command_line.parse(a_argc, a_argv);
 }
 
@@ -42,6 +44,13 @@ clp::python() const
 {
   typedef TCLAP::SwitchArg type;
   return const_cast<type&>(m_language_python).getValue();
+}
+
+bool
+clp::use_numpy() const
+{
+  typedef TCLAP::SwitchArg type;
+  return const_cast<type&>(m_python_use_numpy).getValue();
 }
 
 std::vector<std::string>
@@ -103,7 +112,7 @@ clp::output::usage(interface_type& a_interface)
 
   cout << "Usage: hermes [options] <file> ..." << endl << endl;
   cout << a_interface.getMessage() << endl << endl;
-  cout << "Options:" << endl;
+  cout << "General options:" << endl;
   cout << "  --cpp                 Generate C++ header and source." << endl;
   cout << "  --fortran             Generate Fortran source." << endl;
   cout << "  --python              Generate Python source." << endl;
@@ -111,6 +120,8 @@ clp::output::usage(interface_type& a_interface)
   cout << "  --destination=<dir>   Destination directory (default: current directory)." << endl;
   cout << "  --version             Display version information and exit." << endl;
   cout << "  -h, --help            Display this help text and exit." << endl;
+  cout << endl << "Python options:" << endl;
+  cout << "  --numpy               Use numpy arrays instead of lists." << endl;
   cout << endl << "Argument:" << endl;
   cout << "  <file>                Interface in the Hermes interface definition language." << endl;
 }

@@ -23,8 +23,13 @@ public:
 
   std::string name() const;
   std::string default_value() const;
-  void pack(std::ostream& a_out, const std::string& a_variable) const;
-  void unpack(std::ostream& a_out, const std::string& a_variable) const;
+
+  void pack(std::ostream& a_out,
+            const std::string& a_variable,
+            bool a_numpy = false) const;
+  void unpack(std::ostream& a_out,
+              const std::string& a_variable,
+              bool a_numpy = false) const;
 private:
   pointer m_type;
 };

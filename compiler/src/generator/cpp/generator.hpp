@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <string>
 #include <vector>
+#include "json/json.hpp"
 #include "state/blueprint.hpp"
 #include "generator/iomanip.hpp"
 #include "generator/utilities.hpp"
@@ -19,7 +20,7 @@ namespace cpp {
 class generator
 {
 public:
-  generator();
+  generator(const nlohmann::json& a_options);
 
   void open(const std::string& a_project, const std::string& a_directory);
   void write(const state::blueprint& a_blueprint);

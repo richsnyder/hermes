@@ -16,6 +16,8 @@ public:
   bool fortran() const;
   bool python() const;
 
+  bool use_numpy() const;
+
   std::vector<std::string> import_paths() const;
   std::string output_directory() const;
 
@@ -33,13 +35,15 @@ protected:
   };
 private:
   output m_output;
+  TCLAP::CmdLine m_command_line;
   TCLAP::SwitchArg m_language_cpp;
   TCLAP::SwitchArg m_language_fortran;
   TCLAP::SwitchArg m_language_python;
   TCLAP::MultiArg<std::string> m_import_paths;
   TCLAP::ValueArg<std::string> m_output_directory;
   TCLAP::UnlabeledMultiArg<std::string> m_input_files;
-  TCLAP::CmdLine m_command_line;
+
+  TCLAP::SwitchArg m_python_use_numpy;
 };
 
 } // compiler namespace

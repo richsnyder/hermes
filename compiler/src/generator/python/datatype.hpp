@@ -22,13 +22,21 @@ public:
   virtual ~datatype();
 
   virtual std::string name() const;
+  virtual std::string numpy_type() const;
   virtual std::string default_value() const = 0;
-  virtual void pack(std::ostream& a_out, const std::string& a_variable) const;
-  virtual void unpack(std::ostream& a_out, const std::string& a_variable) const;
+
+  virtual void pack(std::ostream& a_out,
+                    const std::string& a_variable,
+                    bool a_numpy = false) const;
+  virtual void unpack(std::ostream& a_out,
+                      const std::string& a_variable,
+                      bool a_numpy = false) const;
 protected:
   datatype(const std::string& a_name);
+  datatype(const std::string& a_name, const std::string& a_numpy_datatype);
 private:
   std::string m_name;
+  std::string m_numpy_type;
 };
 
 } // python namespace

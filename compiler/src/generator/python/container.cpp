@@ -26,20 +26,24 @@ map::default_value() const
 }
 
 void
-map::pack(std::ostream& a_out, const std::string& a_variable) const
+map::pack(std::ostream& a_out,
+          const std::string& a_variable,
+          bool a_numpy) const
 {
   using std::endl;
 
   a_out << tab << "xdr.pack_uint(len(" << a_variable << "))" << endl;
   a_out << tab << "for key, value in " << a_variable << ".iteritems():" << endl;
   a_out << indent;
-  m_key_type->pack(a_out, "key");
-  m_value_type->pack(a_out, "value");
+  m_key_type->pack(a_out, "key", a_numpy);
+  m_value_type->pack(a_out, "value", a_numpy);
   a_out << unindent;
 }
 
 void
-map::unpack(std::ostream& a_out, const std::string& a_variable) const
+map::unpack(std::ostream& a_out,
+            const std::string& a_variable,
+            bool a_numpy) const
 {
   using std::endl;
 
@@ -48,8 +52,8 @@ map::unpack(std::ostream& a_out, const std::string& a_variable) const
   a_out << tab << length << " = xdr.unpack_uint()" << endl;
   a_out << tab << "for n in range(" << length << "):" << endl;
   a_out << indent;
-  m_key_type->unpack(a_out, "key");
-  m_value_type->unpack(a_out, "value");
+  m_key_type->unpack(a_out, "key", a_numpy);
+  m_value_type->unpack(a_out, "value", a_numpy);
   a_out << tab << a_variable << "[key] = value" << endl;
   a_out << unindent;
 }
@@ -68,19 +72,23 @@ set::default_value() const
 }
 
 void
-set::pack(std::ostream& a_out, const std::string& a_variable) const
+set::pack(std::ostream& a_out,
+          const std::string& a_variable,
+          bool a_numpy) const
 {
   using std::endl;
 
   a_out << tab << "xdr.pack_uint(len(" << a_variable << "))" << endl;
   a_out << tab << "for key in " << a_variable << ":" << endl;
   a_out << indent;
-  m_key_type->pack(a_out, "key");
+  m_key_type->pack(a_out, "key", a_numpy);
   a_out << unindent;
 }
 
 void
-set::unpack(std::ostream& a_out, const std::string& a_variable) const
+set::unpack(std::ostream& a_out,
+            const std::string& a_variable,
+            bool a_numpy) const
 {
   using std::endl;
 
@@ -89,7 +97,7 @@ set::unpack(std::ostream& a_out, const std::string& a_variable) const
   a_out << tab << length << " = xdr.unpack_uint()" << endl;
   a_out << tab << "for n in range(" << length << "):" << endl;
   a_out << indent;
-  m_key_type->unpack(a_out, "key");
+  m_key_type->unpack(a_out, "key", a_numpy);
   a_out << tab << a_variable << ".update([key])" << endl;
   a_out << unindent;
 }
@@ -108,29 +116,48 @@ vector::default_value() const
 }
 
 void
-vector::pack(std::ostream& a_out, const std::string& a_variable) const
+vector::pack(std::ostream& a_out,
+             const std::string& a_variable,
+             bool a_numpy) const
 {
   using std::endl;
 
   a_out << tab << "xdr.pack_uint(len(" << a_variable << "))" << endl;
   a_out << tab << "for value in " << a_variable << ":" << endl;
   a_out << indent;
-  m_value_type->pack(a_out, "value");
+  m_value_type->pack(a_out, "value", a_numpy);
   a_out << unindent;
 }
 
 void
-vector::unpack(std::ostream& a_out, const std::string& a_variable) const
+vector::unpack(std::ostream& a_out,
+               const std::string& a_variable,
+               bool a_numpy) const
 {
   using std::endl;
 
   auto length = "l_" + a_variable;
-  a_out << tab << a_variable << " = []" << endl;
   a_out << tab << length << " = xdr.unpack_uint()" << endl;
+  if (a_numpy)
+  {
+    a_out << tab << a_variable << " = numpy.empty(" << length
+          << ", dtype=numpy." << m_value_type->numpy_type() << ")" << endl;
+  }
+  else
+  {
+    a_out << tab << a_variable << " = []" << endl;
+  }
   a_out << tab << "for n in range(" << length << "):" << endl;
   a_out << indent;
-  m_value_type->unpack(a_out, "value");
-  a_out << tab << a_variable << ".append(value)" << endl;
+  if (a_numpy)
+  {
+    m_value_type->unpack(a_out, a_variable + "[n]", a_numpy);
+  }
+  else
+  {
+    m_value_type->unpack(a_out, "value", a_numpy);
+    a_out << tab << a_variable << ".append(value)" << endl;
+  }
   a_out << unindent;
 }
 

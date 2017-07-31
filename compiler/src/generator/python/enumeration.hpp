@@ -18,8 +18,13 @@ public:
   enumeration& operator=(const enumeration&) = delete;
 
   std::string default_value() const;
-  void pack(std::ostream& a_out, const std::string& a_variable) const;
-  void unpack(std::ostream& a_out, const std::string& a_variable) const;
+
+  void pack(std::ostream& a_out,
+            const std::string& a_variable,
+            bool a_numpy) const;
+  void unpack(std::ostream& a_out,
+              const std::string& a_variable,
+              bool a_numpy) const;
 };
 
 } // python namespace

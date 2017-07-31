@@ -16,12 +16,18 @@ public:
   basic(const basic&) = delete;
   basic& operator=(const basic&) = delete;
 
-  void pack(std::ostream& a_out, const std::string& a_variable) const;
-  void unpack(std::ostream& a_out, const std::string& a_variable) const;
+  void pack(std::ostream& a_out,
+            const std::string& a_variable,
+            bool a_numpy = false) const;
+  void unpack(std::ostream& a_out,
+              const std::string& a_variable,
+              bool a_numpy = false) const;
 protected:
-  basic(const std::string& a_name, const std::string& a_type);
+  basic(const std::string& a_name,
+        const std::string& a_xdr_type,
+        const std::string& a_numpy_type);
 private:
-  std::string m_type;
+  std::string m_xdr_type;
 };
 
 class bool_t : public basic
@@ -42,8 +48,13 @@ public:
   char_t& operator=(const char_t&) = delete;
 
   std::string default_value() const;
-  void pack(std::ostream& a_out, const std::string& a_variable) const;
-  void unpack(std::ostream& a_out, const std::string& a_variable) const;
+
+  void pack(std::ostream& a_out,
+            const std::string& a_variable,
+            bool a_numpy = false) const;
+  void unpack(std::ostream& a_out,
+              const std::string& a_variable,
+              bool a_numpy = false) const;
 };
 
 class int8 : public basic

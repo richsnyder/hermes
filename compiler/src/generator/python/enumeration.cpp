@@ -18,13 +18,17 @@ enumeration::default_value() const
 }
 
 void
-enumeration::pack(std::ostream& a_out, const std::string& a_variable) const
+enumeration::pack(std::ostream& a_out,
+                  const std::string& a_variable,
+                  bool a_numpy) const
 {
   a_out << tab << "xdr.pack_int(" << a_variable << ")" << std::endl;
 }
 
 void
-enumeration::unpack(std::ostream& a_out, const std::string& a_variable) const
+enumeration::unpack(std::ostream& a_out,
+                    const std::string& a_variable,
+                    bool a_numpy) const
 {
   a_out << tab << a_variable << " = xdr.unpack_int()" << std::endl;
 }

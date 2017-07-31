@@ -5,7 +5,7 @@ namespace compiler {
 namespace generator {
 namespace fortran {
 
-generator::generator()
+generator::generator(const nlohmann::json& a_options)
   : m_blueprint(nullptr)
 {
   // empty

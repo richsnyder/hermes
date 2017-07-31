@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <string>
 #include <vector>
+#include "json/json.hpp"
 #include "state/blueprint.hpp"
 #include "generator/iomanip.hpp"
 #include "generator/utilities.hpp"
@@ -19,7 +20,7 @@ namespace python {
 class generator
 {
 public:
-  generator();
+  generator(const nlohmann::json& a_options);
 
   void open(const std::string& a_project, const std::string& a_directory);
   void write(const state::blueprint& a_blueprint);
@@ -27,6 +28,8 @@ public:
 protected:
   typedef std::shared_ptr<datatype> pointer;
   typedef std::vector<state::field> field_vector;
+
+  bool use_numpy() const;
 
   void write_header();
   void write_structures();
@@ -53,6 +56,7 @@ private:
   std::string m_py_path;
   std::ofstream m_py;
   const state::blueprint* m_blueprint;
+  bool m_use_numpy;
 };
 
 } // python namespace

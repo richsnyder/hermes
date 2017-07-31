@@ -5,27 +5,35 @@ namespace compiler {
 namespace generator {
 namespace python {
 
-basic::basic(const std::string& a_name, const std::string& a_type)
-  : datatype(a_name)
-  , m_type(a_type)
+basic::basic(const std::string& a_name,
+             const std::string& a_xdr_type,
+             const std::string& a_numpy_type)
+  : datatype(a_name, a_numpy_type)
+  , m_xdr_type(a_xdr_type)
 {
   // empty
 }
 
 void
-basic::pack(std::ostream& a_out, const std::string& a_variable) const
+basic::pack(std::ostream& a_out,
+            const std::string& a_variable,
+            bool a_numpy) const
 {
-  a_out << tab << "xdr.pack_" << m_type << "(" << a_variable << ")" << std::endl;
+  a_out << tab << "xdr.pack_" << m_xdr_type
+        << "(" << a_variable << ")" << std::endl;
 }
 
 void
-basic::unpack(std::ostream& a_out, const std::string& a_variable) const
+basic::unpack(std::ostream& a_out,
+              const std::string& a_variable,
+              bool a_numpy) const
 {
-  a_out << tab << a_variable << " = xdr.unpack_" << m_type << "()" << std::endl;
+  a_out << tab << a_variable << " = xdr.unpack_" << m_xdr_type
+        << "()" << std::endl;
 }
 
 bool_t::bool_t()
-  : basic("bool", "bool")
+  : basic("bool", "bool", "bool_")
 {
   // empty
 }
@@ -37,7 +45,7 @@ bool_t::default_value() const
 }
 
 char_t::char_t()
-  : basic("str", "fstring")
+  : basic("str", "fstring", "string_")
 {
   // empty
 }
@@ -49,19 +57,23 @@ char_t::default_value() const
 }
 
 void
-char_t::pack(std::ostream& a_out, const std::string& a_variable) const
+char_t::pack(std::ostream& a_out,
+             const std::string& a_variable,
+             bool a_numpy) const
 {
   a_out << tab << "xdr.pack_fstring(self." << a_variable << ", 1)" << std::endl;
 }
 
 void
-char_t::unpack(std::ostream& a_out, const std::string& a_variable) const
+char_t::unpack(std::ostream& a_out,
+               const std::string& a_variable,
+               bool a_numpy) const
 {
   a_out << tab << "xdr.unpack_fstring(1)" << std::endl;
 }
 
 int8::int8()
-  : basic("int", "int")
+  : basic("int", "int", "int8")
 {
   // empty
 }
@@ -73,7 +85,7 @@ int8::default_value() const
 }
 
 int16::int16()
-  : basic("int", "int")
+  : basic("int", "int", "int16")
 {
   // empty
 }
@@ -85,7 +97,7 @@ int16::default_value() const
 }
 
 int32::int32()
-  : basic("int", "int")
+  : basic("int", "int", "int32")
 {
   // empty
 }
@@ -97,7 +109,7 @@ int32::default_value() const
 }
 
 int64::int64()
-  : basic("long", "hyper")
+  : basic("long", "hyper", "int64")
 {
   // empty
 }
@@ -109,7 +121,7 @@ int64::default_value() const
 }
 
 uint8::uint8()
-  : basic("int", "uint")
+  : basic("int", "uint", "uint8")
 {
   // empty
 }
@@ -121,7 +133,7 @@ uint8::default_value() const
 }
 
 uint16::uint16()
-  : basic("int", "uint")
+  : basic("int", "uint", "uint16")
 {
   // empty
 }
@@ -133,7 +145,7 @@ uint16::default_value() const
 }
 
 uint32::uint32()
-  : basic("long", "uint")
+  : basic("long", "uint", "uint32")
 {
   // empty
 }
@@ -145,7 +157,7 @@ uint32::default_value() const
 }
 
 uint64::uint64()
-  : basic("long", "uhyper")
+  : basic("long", "uhyper", "uint64")
 {
   // empty
 }
@@ -157,7 +169,7 @@ uint64::default_value() const
 }
 
 real32::real32()
-  : basic("float", "float")
+  : basic("float", "float", "float32")
 {
   // empty
 }
@@ -169,7 +181,7 @@ real32::default_value() const
 }
 
 real64::real64()
-  : basic("float", "double")
+  : basic("float", "double", "float64")
 {
   // empty
 }
@@ -181,7 +193,7 @@ real64::default_value() const
 }
 
 string::string()
-  : basic("str", "string")
+  : basic("str", "string", "string_")
 {
   // empty
 }

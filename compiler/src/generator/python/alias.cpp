@@ -25,15 +25,19 @@ alias::default_value() const
 }
 
 void
-alias::pack(std::ostream& a_out, const std::string& a_variable) const
+alias::pack(std::ostream& a_out,
+            const std::string& a_variable,
+            bool a_numpy) const
 {
-  m_type->pack(a_out, a_variable);
+  m_type->pack(a_out, a_variable, a_numpy);
 }
 
 void
-alias::unpack(std::ostream& a_out, const std::string& a_variable) const
+alias::unpack(std::ostream& a_out,
+              const std::string& a_variable,
+              bool a_numpy) const
 {
-  m_type->unpack(a_out, a_variable);
+  m_type->unpack(a_out, a_variable, a_numpy);
 }
 
 } // python namespace

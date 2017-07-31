@@ -31,8 +31,13 @@ public:
   map(pointer a_key_type, pointer a_value_type);
 
   std::string default_value() const;
-  void pack(std::ostream& a_out, const std::string& a_variable) const;
-  void unpack(std::ostream& a_out, const std::string& a_variable) const;
+
+  void pack(std::ostream& a_out,
+            const std::string& a_variable,
+            bool a_numpy = false) const;
+  void unpack(std::ostream& a_out,
+              const std::string& a_variable,
+              bool a_numpy = false) const;
 private:
   pointer m_key_type;
   pointer m_value_type;
@@ -49,8 +54,13 @@ public:
   set(pointer a_key_type);
 
   std::string default_value() const;
-  void pack(std::ostream& a_out, const std::string& a_variable) const;
-  void unpack(std::ostream& a_out, const std::string& a_variable) const;
+
+  void pack(std::ostream& a_out,
+            const std::string& a_variable,
+            bool a_numpy = false) const;
+  void unpack(std::ostream& a_out,
+              const std::string& a_variable,
+              bool a_numpy = false) const;
 private:
   pointer m_key_type;
 };
@@ -66,8 +76,13 @@ public:
   vector(pointer a_value_type);
 
   std::string default_value() const;
-  void pack(std::ostream& a_out, const std::string& a_variable) const;
-  void unpack(std::ostream& a_out, const std::string& a_variable) const;
+
+  void pack(std::ostream& a_out,
+            const std::string& a_variable,
+            bool a_numpy = false) const;
+  void unpack(std::ostream& a_out,
+              const std::string& a_variable,
+              bool a_numpy = false) const;
 private:
   pointer m_value_type;
 };
