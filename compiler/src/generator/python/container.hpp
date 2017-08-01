@@ -20,6 +20,29 @@ protected:
   container(const std::string& a_name);
 };
 
+class pair : public container
+{
+public:
+  typedef std::shared_ptr<datatype> pointer;
+
+  pair() = delete;
+  pair(const pair&) = delete;
+  pair& operator=(const pair&) = delete;
+  pair(pointer a_first_type, pointer a_second_type);
+
+  std::string default_value() const;
+
+  void pack(std::ostream& a_out,
+            const std::string& a_variable,
+            bool a_numpy = false) const;
+  void unpack(std::ostream& a_out,
+              const std::string& a_variable,
+              bool a_numpy = false) const;
+private:
+  pointer m_first_type;
+  pointer m_second_type;
+};
+
 class map : public container
 {
 public:

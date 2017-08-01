@@ -311,8 +311,8 @@ blueprint::make_map()
 void
 blueprint::make_pair()
 {
-  pointer first = type();
   pointer second = type();
+  pointer first = type();
   m_datatypes.push(std::make_shared<pair>(first, second));
 }
 
