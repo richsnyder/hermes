@@ -61,6 +61,7 @@ protected:
   void make_exception();
   void make_interface();
   void make_map();
+  void make_pair();
   void make_procedure();
   void make_set();
   void make_space();

@@ -16,6 +16,32 @@ container::is_container() const
   return true;
 }
 
+pair::pair(pointer a_first_type, pointer a_second_type)
+  : container("pair<" + a_first_type->name() + "," + a_second_type->name() + ">")
+  , m_first_type(std::move(a_first_type))
+  , m_second_type(std::move(a_second_type))
+{
+  // empty
+}
+
+bool
+pair::is_pair() const
+{
+  return true;
+}
+
+pair::pointer
+pair::first_type() const
+{
+  return m_first_type;
+}
+
+pair::pointer
+pair::second_type() const
+{
+  return m_second_type;
+}
+
 map::map(pointer a_key_type, pointer a_value_type)
   : container("map<" + a_key_type->name() + "," + a_value_type->name() + ">")
   , m_key_type(std::move(a_key_type))

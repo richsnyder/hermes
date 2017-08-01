@@ -39,6 +39,7 @@ public:
   virtual bool is_string() const;
   virtual bool is_void() const;
 
+  virtual bool is_pair() const;
   virtual bool is_map() const;
   virtual bool is_set() const;
   virtual bool is_vector() const;

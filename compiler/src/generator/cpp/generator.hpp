@@ -73,6 +73,7 @@ protected:
   void size(const std::string& a_class, const state::field& a_field);
   void resizer(const std::string& a_class, const state::field& a_field);
   void clearer(const std::string& a_class, const state::field& a_field);
+  void pair_setter(const std::string& a_class, const state::field& a_field);
   void map_getter(const std::string& a_class, const state::field& a_field);
   void map_inserter(const std::string& a_class, const state::field& a_field);
   void set_counter(const std::string& a_class, const state::field& a_field);

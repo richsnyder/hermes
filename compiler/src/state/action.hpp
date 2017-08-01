@@ -140,6 +140,15 @@ struct action<parser::basic::string>
 };
 
 template <>
+struct action<parser::pair::end>
+{
+  static void apply(const parser::input& a_input, blueprint& a_blueprint)
+  {
+    a_blueprint.make_pair();
+  }
+};
+
+template <>
 struct action<parser::map::end>
 {
   static void apply(const parser::input& a_input, blueprint& a_blueprint)

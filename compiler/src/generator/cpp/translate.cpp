@@ -96,6 +96,13 @@ translate(std::shared_ptr<state::datatype> a_datatype)
   {
     return std::make_shared<void_t>();
   }
+  else if (a_datatype->is_pair())
+  {
+    auto as_pair = std::dynamic_pointer_cast<state::pair>(a_datatype);
+    std::shared_ptr<datatype> first_type = translate(as_pair->first_type());
+    std::shared_ptr<datatype> second_type = translate(as_pair->second_type());
+    return std::make_shared<pair>(first_type, second_type);
+  }
   else if (a_datatype->is_map())
   {
     auto as_map = std::dynamic_pointer_cast<state::map>(a_datatype);

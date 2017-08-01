@@ -143,6 +143,12 @@ datatype::is_void() const
 }
 
 bool
+datatype::is_pair() const
+{
+  return false;
+}
+
+bool
 datatype::is_map() const
 {
   return false;
