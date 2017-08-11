@@ -70,6 +70,12 @@ public:
   bool operator()(std::string& a_value);
   bool operator()(std::vector<bool>& a_vector);
 
+  template <typename T1, typename T2>
+  bool operator()(std::pair<T1, T2>& a_pair)
+  {
+    return operator()(a_pair.first) && operator()(a_pair.second);
+  }
+
   template <typename T, typename U>
   bool operator()(std::map<T, U>& a_map)
   {
@@ -199,6 +205,12 @@ public:
   bool operator()(const std::string& a_value);
   bool operator()(std::vector<bool>& a_vector);
   bool operator()(const std::vector<bool>& a_vector);
+
+  template <typename T1, typename T2>
+  bool operator()(std::pair<T1, T2>& a_pair)
+  {
+    return operator()(a_pair.first) && operator()(a_pair.second);
+  }
 
   template <typename T, typename U>
   bool operator()(std::map<T, U>& a_map)

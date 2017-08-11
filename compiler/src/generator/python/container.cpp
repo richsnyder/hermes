@@ -11,6 +11,45 @@ container::container(const std::string& a_name)
   // empty
 }
 
+pair::pair(pointer a_first_type, pointer a_second_type)
+  : container("tuple")
+  , m_first_type(a_first_type)
+  , m_second_type(a_second_type)
+{
+  // empty
+}
+
+std::string
+pair::default_value() const
+{
+  std::string first = m_first_type->default_value();
+  std::string second = m_second_type->default_value();
+  return "(" + first + ", " + second + ")";
+}
+
+void
+pair::pack(std::ostream& a_out,
+          const std::string& a_variable,
+          bool a_numpy) const
+{
+  m_first_type->pack(a_out, a_variable + "[0]", a_numpy);
+  m_second_type->pack(a_out, a_variable + "[1]", a_numpy);
+}
+
+void
+pair::unpack(std::ostream& a_out,
+            const std::string& a_variable,
+            bool a_numpy) const
+{
+  using std::endl;
+
+  std::string p1 = a_variable + "_1";
+  std::string p2 = a_variable + "_2";
+  m_first_type->unpack(a_out, p1, a_numpy);
+  m_second_type->unpack(a_out, p2, a_numpy);
+  a_out << tab << a_variable << " = (" << p1 << ", " << p2 << ")" << endl;
+}
+
 map::map(pointer a_key_type, pointer a_value_type)
   : container("dict")
   , m_key_type(a_key_type)

@@ -241,7 +241,11 @@ generator::write_structure(const state::structure& a_structure)
   }
   for (const auto& field_ : a_structure.fields())
   {
-    if (field_.type()->is_map())
+    if (field_.type()->is_pair())
+    {
+      pair_setter(name, field_);
+    }
+    else if (field_.type()->is_map())
     {
       map_inserter(name, field_);
     }
@@ -645,6 +649,30 @@ generator::clearer(const std::string& a_class, const state::field& a_field)
   m_cpp << tab << "{" << std::endl;
   m_cpp << indent;
   m_cpp << tab << var << ".clear();" << std::endl;
+  m_cpp << unindent;
+  m_cpp << tab << "}" << std::endl << std::endl;
+}
+
+void
+generator::pair_setter(const std::string& a_class, const state::field& a_field)
+{
+  auto as_pair = std::dynamic_pointer_cast<state::pair>(a_field.type());
+  pointer field_type = translate(a_field.type());
+  pointer first_type = translate(as_pair->first_type());
+  pointer second_type = translate(as_pair->second_type());
+  std::string method = "set_" + a_field.name();
+  std::string p1 = first_type->param_type();
+  std::string p2 = second_type->param_type();
+  std::string var = member(a_field.name());
+
+  m_hpp << tab << "void " << method << "(" << p1 << " a_first, " << p2 << " a_second);" << std::endl;
+
+  m_cpp << tab << "void" << std::endl;
+  m_cpp << tab << a_class << "::" << method << "(" << p1 << " a_first, " << p2 << " a_second)" << std::endl;
+  m_cpp << tab << "{" << std::endl;
+  m_cpp << indent;
+  m_cpp << tab << var << ".first = a_first;" << std::endl;
+  m_cpp << tab << var << ".second = a_second;" << std::endl;
   m_cpp << unindent;
   m_cpp << tab << "}" << std::endl << std::endl;
 }

@@ -10,6 +10,22 @@ namespace parser {
 
 struct datatype;
 
+struct pair_keyword : pegtl_string_t("pair") {};
+struct pair_begin : if_must<pair_keyword, left_chevron> {};
+struct pair_content : seq<datatype, comma, datatype> {};
+struct pair_end : right_chevron {};
+struct pair : if_must<
+    pair_begin,
+    pair_content,
+    pair_end
+  >
+{
+  using keyword = pair_keyword;
+  using begin = pair_begin;
+  using content = pair_content;
+  using end = pair_end;
+};
+
 struct map_keyword : pegtl_string_t("map") {};
 struct map_begin : if_must<map_keyword, left_chevron> {};
 struct map_content : seq<datatype, comma, datatype> {};
@@ -52,7 +68,7 @@ struct vector : if_must<
   using end = vector_end;
 };
 
-struct container : sor<map, set, vector> {};
+struct container : sor<pair, map, set, vector> {};
 
 } // parser namespace
 } // compiler namespace

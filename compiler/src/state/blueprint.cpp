@@ -309,6 +309,14 @@ blueprint::make_map()
 }
 
 void
+blueprint::make_pair()
+{
+  pointer second = type();
+  pointer first = type();
+  m_datatypes.push(std::make_shared<pair>(first, second));
+}
+
+void
 blueprint::make_procedure()
 {
   assert(m_working_interface);
