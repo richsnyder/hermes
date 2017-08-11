@@ -3,7 +3,6 @@
 
 #include <iostream>
 #include <string>
-#include "generator/cpp/sizer.hpp"
 
 namespace hermes {
 namespace compiler {
@@ -28,8 +27,6 @@ public:
   virtual std::string reference() const;
   virtual std::string const_reference() const;
   virtual std::string param_type() const;
-
-  virtual std::shared_ptr<sizer> size(const std::string& a_variable) const = 0;
 protected:
   datatype(const std::string& a_name);
 private:

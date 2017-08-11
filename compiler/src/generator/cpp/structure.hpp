@@ -21,8 +21,6 @@ public:
   structure(const std::string& a_name, const std::vector<field>& a_fields);
 
   const std::vector<field>& fields() const;
-
-  std::shared_ptr<sizer> size(const std::string& a_variable) const;
 private:
   std::vector<field> m_fields;
 };

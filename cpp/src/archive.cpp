@@ -267,4 +267,100 @@ oarchive::operator()(const std::vector<bool>& a_vector)
   return operator()(const_cast<std::vector<bool>&>(a_vector));
 }
 
+size_t
+archive_sizer::operator()(bool a_value)
+{
+  return 4;
+}
+
+size_t
+archive_sizer::operator()(char a_value)
+{
+  return 4;
+}
+
+size_t
+archive_sizer::operator()(std::int8_t a_value)
+{
+  return 4;
+}
+
+size_t
+archive_sizer::operator()(std::int16_t a_value)
+{
+  return 4;
+}
+
+size_t
+archive_sizer::operator()(std::int32_t a_value)
+{
+  return 4;
+}
+
+size_t
+archive_sizer::operator()(std::int64_t a_value)
+{
+  return 8;
+}
+
+size_t
+archive_sizer::operator()(std::uint8_t a_value)
+{
+  return 4;
+}
+
+size_t
+archive_sizer::operator()(std::uint16_t a_value)
+{
+  return 4;
+}
+
+size_t
+archive_sizer::operator()(std::uint32_t a_value)
+{
+  return 4;
+}
+
+size_t
+archive_sizer::operator()(std::uint64_t a_value)
+{
+  return 8;
+}
+
+size_t
+archive_sizer::operator()(float a_value)
+{
+  return 4;
+}
+
+size_t
+archive_sizer::operator()(double a_value)
+{
+  return 8;
+}
+
+size_t
+archive_sizer::operator()(std::string& a_value)
+{
+  return 4 + 4 * ((a_value.size() + 3) / 4);
+}
+
+size_t
+archive_sizer::operator()(const std::string& a_value)
+{
+  return operator()(const_cast<std::string&>(a_value));
+}
+
+size_t
+archive_sizer::operator()(std::vector<bool>& a_vector)
+{
+  return 4 + 4 * a_vector.size();
+}
+
+size_t
+archive_sizer::operator()(const std::vector<bool>& a_vector)
+{
+  return operator()(const_cast<std::vector<bool>&>(a_vector));
+}
+
 } // hermes namespace

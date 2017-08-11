@@ -1,2 +1,20 @@
+# macOS attribute files
 **/.DS_Store
+
+# Atom editor
 **/.clang_complete
+
+# CLion IDE
+/.idea/
+/cmake-build-*/
+
+# Sublime Text editor
+/*.sublime-project
+/*.sublime-workspace
+
+# Visual Studio Code editor
+/.vscode/
+/build/
+
+# Working files
+/TODO.md

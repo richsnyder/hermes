@@ -24,8 +24,6 @@ public:
   std::string reference() const;
   std::string const_reference() const;
   std::string param_type() const;
-
-  std::shared_ptr<sizer> size(const std::string& a_variable) const;
 private:
   pointer m_type;
 };

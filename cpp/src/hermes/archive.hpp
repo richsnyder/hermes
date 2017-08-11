@@ -287,6 +287,131 @@ private:
   size_t m_size;
 };
 
+class archive_sizer
+{
+protected:
+  template <typename T, bool IsEnum, bool IsBits>
+  struct helper
+  {
+    static size_t apply(archive_sizer& a_sizer, T& a_value)
+    {
+      return a_value.size_of(a_sizer);
+    }
+  };
+
+  template <typename T>
+  struct helper<T, true, false>
+  {
+    static size_t apply(archive_sizer& a_sizer, T& a_value)
+    {
+      std::int32_t value = static_cast<std::int32_t>(a_value);
+      return a_sizer(value);
+    }
+  };
+
+  template <typename T>
+  struct helper<T, false, true>
+  {
+    static size_t apply(archive_sizer& a_sizer, T& a_value)
+    {
+      bool b;
+      for (const auto& val : a_value)
+      {
+        b = static_cast<bool>(val);
+        return a_sizer(b);
+      }
+    }
+  };
+public:
+  size_t operator()(bool a_value);
+  size_t operator()(char a_value);
+  size_t operator()(std::int8_t a_value);
+  size_t operator()(std::int16_t a_value);
+  size_t operator()(std::int32_t a_value);
+  size_t operator()(std::int64_t a_value);
+  size_t operator()(std::uint8_t a_value);
+  size_t operator()(std::uint16_t a_value);
+  size_t operator()(std::uint32_t a_value);
+  size_t operator()(std::uint64_t a_value);
+  size_t operator()(float a_value);
+  size_t operator()(double a_value);
+  size_t operator()(std::string& a_value);
+  size_t operator()(const std::string& a_value);
+  size_t operator()(std::vector<bool>& a_vector);
+  size_t operator()(const std::vector<bool>& a_vector);
+
+  template <typename T1, typename T2>
+  size_t operator()(std::pair<T1, T2>& a_pair)
+  {
+    return operator()(a_pair.first) + operator()(a_pair.second);
+  }
+
+  template <typename T, typename U>
+  size_t operator()(std::map<T, U>& a_map)
+  {
+    size_t size = 4;
+    for (const auto& key_value : a_map)
+    {
+      size += operator()(key_value.first) + operator()(key_value.second);
+    }
+    return size;
+  }
+
+  template <typename T>
+  size_t operator()(std::set<T>& a_set)
+  {
+    size_t size = 4;
+    for (const auto& key : a_set)
+    {
+      size += operator()(key);
+    }
+    return size;
+  }
+
+  template <typename T>
+  size_t operator()(std::vector<T>& a_vector)
+  {
+    size_t size = 4;
+    for (const auto& value : a_vector)
+    {
+      size += operator()(value);
+    }
+    return size;
+  }
+
+  template <typename T>
+  size_t operator()(T& a_object)
+  {
+    const bool is_enum = std::is_enum<T>::value;
+    const bool is_bits = internal::is_bits<T>::value;
+    return helper<T, is_enum, is_bits>::apply(*this, a_object);
+  }
+
+  template <typename T, typename U>
+  size_t operator()(const std::map<T, U>& a_map)
+  {
+    return operator()(const_cast<std::map<T, U>&>(a_map));
+  }
+
+  template <typename T>
+  size_t operator()(const std::set<T>& a_set)
+  {
+    return operator()(const_cast<std::set<T>&>(a_set));
+  }
+
+  template <typename T>
+  size_t operator()(const std::vector<T>& a_vector)
+  {
+    return operator()(const_cast<std::vector<T>&>(a_vector));
+  }
+
+  template <typename T>
+  size_t operator()(const T& a_object)
+  {
+    return operator()(const_cast<T&>(a_object));
+  }
+};
+
 } // hermes namespace
 
 #endif // HERMES_ARCHIVE_HPP

@@ -9,7 +9,6 @@
 #include "state/blueprint.hpp"
 #include "generator/iomanip.hpp"
 #include "generator/utilities.hpp"
-#include "generator/cpp/sizevar.hpp"
 #include "generator/cpp/translate.hpp"
 
 namespace hermes {
@@ -54,17 +53,16 @@ protected:
   void references(std::ostream& a_out, const field_vector& a_fields);
   void arguments(std::ostream& a_out, const field_vector& a_fields);
   void variables(std::ostream& a_out, const field_vector& a_fields);
+  void archive_size(std::ostream& a_out, const field_vector& a_fields);
   void archive(std::ostream& a_out, const field_vector& a_fields);
   void initialization(std::ostream& a_out, const field_vector& a_fields);
   void empty_body(std::ostream& a_out);
 
   void forwards(std::shared_ptr<state::datatype> a_datatype,
                 std::set<std::string>& a_forwards) const;
-  std::shared_ptr<sizer> get_size(const std::string& a_variable,
-                                  pointer a_datatype) const;
-  std::shared_ptr<sizer> get_size(const field_vector& a_fields) const;
 
   void constructors(const state::structure& a_structure);
+  void size_of(const state::structure& a_structure);
   void decoder(const state::structure& a_structure);
   void encoder(const state::structure& a_structure);
   void member(const state::field& a_field);

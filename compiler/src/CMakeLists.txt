@@ -29,8 +29,6 @@ SET(COMPILER_SOURCES
   generator/cpp/exception.cpp
   generator/cpp/field.cpp
   generator/cpp/generator.cpp
-  generator/cpp/sizer.cpp
-  generator/cpp/sizevar.cpp
   generator/cpp/structure.cpp
   generator/cpp/translate.cpp
   generator/fortran/alias.cpp

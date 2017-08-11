@@ -36,12 +36,6 @@ alias::param_type() const
   return m_type->param_type();
 }
 
-std::shared_ptr<sizer>
-alias::size(const std::string& a_variable) const
-{
-  return m_type->size(a_variable);
-}
-
 } // cpp namespace
 } // generator namespace
 } // compiler namespace

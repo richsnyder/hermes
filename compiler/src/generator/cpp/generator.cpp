@@ -260,6 +260,7 @@ generator::write_structure(const state::structure& a_structure)
     }
   }
   m_hpp << std::endl;
+  size_of(a_structure);
   decoder(a_structure);
   encoder(a_structure);
   m_hpp << unindent;
@@ -388,6 +389,19 @@ generator::variables(std::ostream& a_out, const field_vector& a_fields)
 }
 
 void
+generator::archive_size(std::ostream& a_out, const field_vector& a_fields)
+{
+  bool first = true;
+  a_out << tab << "std::size_t size =";
+  for (const auto& field_ : a_fields)
+  {
+    a_out << (first ? " " : " + ") << "sizer(" << param(field_.name()) << ")";
+    first = false;
+  }
+  a_out << ";" << std::endl;
+}
+
+void
 generator::archive(std::ostream& a_out, const field_vector& a_fields)
 {
   bool first = true;
@@ -455,41 +469,6 @@ generator::forwards(std::shared_ptr<state::datatype> a_datatype,
   }
 }
 
-std::shared_ptr<sizer>
-generator::get_size(const std::string& a_variable, pointer a_datatype) const
-{
-  return a_datatype->size(a_variable);
-}
-
-std::shared_ptr<sizer>
-generator::get_size(const field_vector& a_fields) const
-{
-  if (a_fields.empty())
-  {
-    return std::make_shared<sizer>("{}", 0);
-  }
-
-  bool first = true;
-  pointer field_type = nullptr;
-  std::shared_ptr<sizer> root = nullptr;
-  std::shared_ptr<sizer> next = nullptr;
-  for (const auto& field_ : a_fields)
-  {
-    field_type = translate(field_.type());
-    next = field_type->size(param(field_.name()));
-    if (first)
-    {
-      root = next;
-      first = false;
-    }
-    else
-    {
-      root->link(next);
-    }
-  }
-  return root;
-}
-
 void
 generator::constructors(const state::structure& a_structure)
 {
@@ -506,6 +485,27 @@ generator::constructors(const state::structure& a_structure)
   m_cpp << ")" << std::endl;
   initialization(m_cpp, a_structure.fields());
   empty_body(m_cpp);
+}
+
+void
+generator::size_of(const state::structure& a_structure)
+{
+  m_hpp << tab << "std::size_t size_of(hermes::archive_sizer& a_sizer);" << std::endl;
+
+  m_cpp << tab << "std::size_t" << std::endl;
+  m_cpp << tab << a_structure.name() << "::size_of(hermes::archive_sizer& a_sizer)" << std::endl;
+  m_cpp << tab << "{" << std::endl;
+  m_cpp << indent;
+  m_cpp << tab << "return";
+  bool first = true;
+  for (const auto& field_ : a_structure.fields())
+  {
+    m_cpp << (first ? " " : " + ") << "a_sizer(" << member(field_.name()) << ")";
+    first = false;
+  }
+  m_cpp << ";" << std::endl;
+  m_cpp << unindent;
+  m_cpp << tab << "}" << std::endl << std::endl;
 }
 
 void
@@ -1175,7 +1175,8 @@ generator::rpc_request(const std::string& a_interface,
   m_cpp << tab << "{" << std::endl;
   m_cpp << indent;
   m_cpp << tab << "zmq_msg_t message;" << std::endl;
-  m_cpp << tab << sizevar("size", get_size(a_parameters));
+  m_cpp << tab << "hermes::archive_sizer sizer;" << std::endl;
+  archive_size(m_cpp, a_parameters);
   m_cpp << tab << "hermes::oarchive archive(size);" << std::endl;
   archive(m_cpp, a_parameters);
   m_cpp << tab << "if (!status)" << std::endl;
@@ -1270,7 +1271,8 @@ generator::rpc_reply(const std::string& a_interface,
   m_cpp << ")" << std::endl;
   m_cpp << tab << "{" << std::endl;
   m_cpp << indent;
-  m_cpp << tab << sizevar("size", get_size("a_result", result_type));
+  m_cpp << tab << "hermes::archive_sizer sizer;" << std::endl;
+  m_cpp << tab << "std::size_t size = sizer(a_result);" << std::endl;
   m_cpp << tab << "hermes::oarchive archive(size);" << std::endl;
   m_cpp << tab << "bool status = archive(a_result);" << std::endl;
   m_cpp << tab << "if (!status)" << std::endl;
@@ -1369,7 +1371,8 @@ generator::rpc_exception(const std::string& a_interface,
   m_cpp << tab << "{" << std::endl;
   m_cpp << indent;
   m_cpp << tab << "zmq_msg_t message;" << std::endl;
-  m_cpp << tab << sizevar("size", get_size("a_result", exception_type));
+  m_cpp << tab << "hermes::archive_sizer sizer;" << std::endl;
+  m_cpp << tab << "std::size_t size = sizer(a_result);" << std::endl;
   m_cpp << tab << "hermes::oarchive archive(size);" << std::endl;
   m_cpp << tab << "bool status = archive(a_result);" << std::endl;
   m_cpp << tab << "if (!status)" << std::endl;
