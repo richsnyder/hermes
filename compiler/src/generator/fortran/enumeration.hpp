@@ -19,7 +19,6 @@ public:
 
   std::string in() const;
   std::set<std::string> iso_c_symbols() const;
-  std::shared_ptr<sizer> size(const std::string& a_variable) const;
 };
 
 } // fortran namespace

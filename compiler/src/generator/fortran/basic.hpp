@@ -25,7 +25,6 @@ public:
   bool_t& operator=(const bool_t&) = delete;
 
   std::string in() const;
-  std::shared_ptr<sizer> size(const std::string& a_variable) const;
 };
 
 class char_t : public basic
@@ -37,7 +36,6 @@ public:
 
   std::string in() const;
   std::set<std::string> iso_c_symbols() const;
-  std::shared_ptr<sizer> size(const std::string& a_variable) const;
 };
 
 class int8 : public basic
@@ -49,7 +47,6 @@ public:
 
   std::string in() const;
   std::set<std::string> iso_c_symbols() const;
-  std::shared_ptr<sizer> size(const std::string& a_variable) const;
 };
 
 class int16 : public basic
@@ -61,7 +58,6 @@ public:
 
   std::string in() const;
   std::set<std::string> iso_c_symbols() const;
-  std::shared_ptr<sizer> size(const std::string& a_variable) const;
 };
 
 class int32 : public basic
@@ -73,7 +69,6 @@ public:
 
   std::string in() const;
   std::set<std::string> iso_c_symbols() const;
-  std::shared_ptr<sizer> size(const std::string& a_variable) const;
 };
 
 class int64 : public basic
@@ -85,7 +80,6 @@ public:
 
   std::string in() const;
   std::set<std::string> iso_c_symbols() const;
-  std::shared_ptr<sizer> size(const std::string& a_variable) const;
 };
 
 class uint8 : public basic
@@ -97,7 +91,6 @@ public:
 
   std::string in() const;
   std::set<std::string> iso_c_symbols() const;
-  std::shared_ptr<sizer> size(const std::string& a_variable) const;
 };
 
 class uint16 : public basic
@@ -109,7 +102,6 @@ public:
 
   std::string in() const;
   std::set<std::string> iso_c_symbols() const;
-  std::shared_ptr<sizer> size(const std::string& a_variable) const;
 };
 
 class uint32 : public basic
@@ -121,7 +113,6 @@ public:
 
   std::string in() const;
   std::set<std::string> iso_c_symbols() const;
-  std::shared_ptr<sizer> size(const std::string& a_variable) const;
 };
 
 class uint64 : public basic
@@ -132,7 +123,6 @@ public:
   uint64& operator=(const uint64&) = delete;
 
   std::string in() const;
-  std::shared_ptr<sizer> size(const std::string& a_variable) const;
 };
 
 class real32 : public basic
@@ -144,7 +134,6 @@ public:
 
   std::string in() const;
   std::set<std::string> iso_c_symbols() const;
-  std::shared_ptr<sizer> size(const std::string& a_variable) const;
 };
 
 class real64 : public basic
@@ -156,7 +145,6 @@ public:
 
   std::string in() const;
   std::set<std::string> iso_c_symbols() const;
-  std::shared_ptr<sizer> size(const std::string& a_variable) const;
 };
 
 class string : public basic
@@ -170,7 +158,6 @@ public:
   std::string out() const;
   bool allocatable() const;
   std::set<std::string> iso_c_symbols() const;
-  std::shared_ptr<sizer> size(const std::string& a_variable) const;
 };
 
 } // fortran namespace

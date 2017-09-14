@@ -28,8 +28,6 @@ public:
   pair(const pair&) = delete;
   pair& operator=(const pair&) = delete;
   pair(pointer a_first_type, pointer a_second_type);
-
-  std::shared_ptr<sizer> size(const std::string& a_variable) const;
 private:
   pointer m_first_type;
   pointer m_second_type;
@@ -44,8 +42,6 @@ public:
   map(const map&) = delete;
   map& operator=(const map&) = delete;
   map(pointer a_key_type, pointer a_value_type);
-
-  std::shared_ptr<sizer> size(const std::string& a_variable) const;
 private:
   pointer m_key_type;
   pointer m_value_type;
@@ -60,8 +56,6 @@ public:
   set(const set&) = delete;
   set& operator=(const set&) = delete;
   set(pointer a_key_type);
-
-  std::shared_ptr<sizer> size(const std::string& a_variable) const;
 private:
   pointer m_key_type;
 };
@@ -75,8 +69,6 @@ public:
   vector(const vector&) = delete;
   vector& operator=(const vector&) = delete;
   vector(pointer a_value_type);
-
-  std::shared_ptr<sizer> size(const std::string& a_variable) const;
 private:
   pointer m_value_type;
 };

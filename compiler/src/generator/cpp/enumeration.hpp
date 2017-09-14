@@ -20,8 +20,6 @@ public:
   enumeration(const std::string& a_name);
 
   std::string param_type() const;
-
-  std::shared_ptr<sizer> size(const std::string& a_variable) const;
 };
 
 } // cpp namespace

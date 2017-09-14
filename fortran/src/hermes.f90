@@ -16,6 +16,7 @@ module hermes
     contains
       procedure(serializable_read), public, deferred :: read
       procedure(serializable_write), public, deferred :: write
+      procedure(serializable_size), public, deferred :: size
   end type
 
   type, private :: header
@@ -71,6 +72,16 @@ module hermes
       procedure, public :: vector => oarchive_write_vector
       procedure, public :: unsigned_vector => oarchive_write_unsigned_vector
       procedure, public :: character_vector => oarchive_write_character_vector
+  end type
+
+  type, public :: archive_sizer
+    contains
+      procedure, public :: value => archive_sizer_value
+      procedure, public :: unsigned => archive_sizer_unsigned
+      procedure, public :: character => archive_sizer_character
+      procedure, public :: vector => archive_sizer_vector
+      procedure, public :: unsigned_vector => archive_sizer_unsigned_vector
+      procedure, public :: character_vector => archive_sizer_character_vector
   end type
 
   type, public :: client
@@ -137,6 +148,15 @@ module hermes
       class(serializable) :: self
       type(oarchive), intent(inout) :: a_archive
       logical :: status
+    end function
+
+    function serializable_size(self, a_sizer) result(nbytes)
+      use, intrinsic :: iso_c_binding, only : c_size_t
+      import serializable
+      import archive_sizer
+      class(serializable) :: self
+      type(archive_sizer), intent(in) :: a_sizer
+      integer(kind = c_size_t) :: nbytes
     end function
 
     subroutine server_serve_once(self)
@@ -513,6 +533,101 @@ contains
     status = self%value(length)
     do n = 1, length
       status = status .and. self%character(a_values(n))
+    end do
+  end function
+
+  function archive_sizer_value(self, a_object) result(nbytes)
+    class(archive_sizer) :: self
+    class(*), intent(in) :: a_object
+    integer(kind = c_size_t) :: nbytes
+
+    select type(a_object)
+      type is (logical)
+        nbytes = 4_c_size_t
+      type is (integer(kind = c_int8_t))
+        nbytes = 4_c_size_t
+      type is (integer(kind = c_int16_t))
+        nbytes = 4_c_size_t
+      type is (integer(kind = c_int32_t))
+        nbytes = 4_c_size_t
+      type is (integer(kind = c_int64_t))
+        nbytes = 8_c_size_t
+      type is (real(kind = c_float))
+        nbytes = 4_c_size_t
+      type is (real(kind = c_double))
+        nbytes = 8_c_size_t
+      type is (character(kind = c_char, len = *))
+        nbytes = 4 * ((len(a_object, kind = c_size_t) + 3) / 4)
+      class is (serializable)
+        nbytes = a_object%size(self)
+    end select
+  end function
+
+  function archive_sizer_unsigned(self, a_object) result(nbytes)
+    class(archive_sizer) :: self
+    class(*), intent(in) :: a_object
+    integer(kind = c_size_t) :: nbytes
+
+    select type(a_object)
+      type is (integer(kind = c_int16_t))
+        nbytes = 4_c_size_t
+      type is (integer(kind = c_int32_t))
+        nbytes = 4_c_size_t
+      type is (integer(kind = c_int64_t))
+        nbytes = 8_c_size_t
+    end select
+  end function
+
+  function archive_sizer_character(self, a_value) result(nbytes)
+    class(archive_sizer) :: self
+    character(kind = c_char), intent(in) :: a_value
+    integer(kind = c_size_t) :: nbytes
+
+    nbytes = 4_c_size_t
+  end function
+
+  function archive_sizer_vector(self, a_objects) result(nbytes)
+    class(archive_sizer) :: self
+    class(*), dimension(:), intent(in) :: a_objects
+    integer(kind = c_size_t) :: nbytes
+
+    integer(kind = c_int32_t) :: n
+    integer(kind = c_int32_t) :: length
+
+    length = size(a_objects)
+    nbytes = 4_c_size_t
+    do n = 1, length
+      nbytes = nbytes + self%value(a_objects(n))
+    end do
+  end function
+
+  function archive_sizer_unsigned_vector(self, a_objects) result(nbytes)
+    class(archive_sizer) :: self
+    class(*), dimension(:), intent(in) :: a_objects
+    integer(kind = c_size_t) :: nbytes
+
+    integer(kind = c_int32_t) :: n
+    integer(kind = c_int32_t) :: length
+
+    length = size(a_objects)
+    nbytes = 4_c_size_t
+    do n = 1, length
+      nbytes = nbytes + self%unsigned(a_objects(n))
+    end do
+  end function
+
+  function archive_sizer_character_vector(self, a_values) result(nbytes)
+    class(archive_sizer) :: self
+    character(kind = c_char), dimension(:), intent(in) :: a_values
+    integer(kind = c_size_t) :: nbytes
+
+    integer(kind = c_int32_t) :: n
+    integer(kind = c_int32_t) :: length
+
+    length = size(a_values)
+    nbytes = 4_c_size_t
+    do n = 1, length
+      nbytes = nbytes + self%character(a_values(n))
     end do
   end function
 
