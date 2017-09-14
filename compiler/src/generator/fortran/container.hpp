@@ -36,7 +36,6 @@ public:
   std::string out() const;
   std::set<std::string> iso_c_symbols() const;
   std::set<std::string> structures() const;
-  std::shared_ptr<sizer> size(const std::string& a_variable) const;
 private:
   pointer m_key_type;
   pointer m_value_type;
@@ -58,7 +57,6 @@ public:
   std::string out() const;
   std::set<std::string> iso_c_symbols() const;
   std::set<std::string> structures() const;
-  std::shared_ptr<sizer> size(const std::string& a_variable) const;
 private:
   pointer m_key_type;
 };
@@ -79,7 +77,6 @@ public:
   std::string out() const;
   std::set<std::string> iso_c_symbols() const;
   std::set<std::string> structures() const;
-  std::shared_ptr<sizer> size(const std::string& a_variable) const;
 private:
   pointer m_value_type;
 };

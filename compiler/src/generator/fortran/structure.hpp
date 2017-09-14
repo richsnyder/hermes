@@ -22,7 +22,6 @@ public:
 
   std::string in() const;
   std::set<std::string> structures() const;
-  std::shared_ptr<sizer> size(const std::string& a_variable) const;
 private:
   std::string m_name;
   std::vector<field> m_fields;

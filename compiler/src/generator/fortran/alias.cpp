@@ -48,12 +48,6 @@ alias::structures() const
   return m_type->structures();
 }
 
-std::shared_ptr<sizer>
-alias::size(const std::string& a_variable) const
-{
-  return m_type->size(a_variable);
-}
-
 } // fortran namespace
 } // generator namespace
 } // compiler namespace

@@ -10,7 +10,6 @@
 #include "state/blueprint.hpp"
 #include "generator/iomanip.hpp"
 #include "generator/utilities.hpp"
-#include "generator/fortran/sizevar.hpp"
 #include "generator/fortran/translate.hpp"
 
 namespace hermes {
@@ -74,8 +73,11 @@ protected:
   void clearer(const std::string& a_structure, const state::field& a_field);
   void reader(std::shared_ptr<state::structure> a_structure);
   void writer(std::shared_ptr<state::structure> a_structure);
+  void sizer(std::shared_ptr<state::structure> a_structure);
   void archive(const field_vector& a_fields, bool a_input);
   void archive(const std::string& a_name, std::shared_ptr<state::datatype> a_type, bool a_input, bool a_first);
+  void size_buffer(const field_vector& a_fields, bool a_input);
+  void size_buffer(const std::string& a_name, std::shared_ptr<state::datatype> a_type, bool a_input, bool a_first);
   void base_call(const std::string& a_interface, const state::procedure& a_procedure);
   void code_call(const std::string& a_interface, const state::procedure& a_procedure);
   void client_request(const std::string& a_interface, const state::procedure& a_procedure, int a_id);
@@ -85,10 +87,6 @@ protected:
   void server_throw(const std::string& a_interface, std::shared_ptr<state::exception> a_exception, int a_id);
   void server_throw_error(const state::interface& a_interface);
   void server_serve_once(const state::interface& a_interface);
-
-  std::shared_ptr<sizer> get_size(const std::string& a_variable,
-                                  pointer a_datatype) const;
-  std::shared_ptr<sizer> get_size(const field_vector& a_fields) const;
 
   std::set<std::string> imports(std::shared_ptr<state::datatype> a_type) const;
   std::set<std::string> imports(std::shared_ptr<state::datatype> a_result, const field_vector& a_fields) const;

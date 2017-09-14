@@ -251,6 +251,7 @@ generator::structure_type(std::shared_ptr<state::structure> a_structure)
   m_src << std::endl;
   public_procedure(name, "read");
   public_procedure(name, "write");
+  public_procedure(name, "size");
   m_src << unindent << unindent;
   m_src << tab << "end type" << std::endl << std::endl;
 }
@@ -307,6 +308,7 @@ generator::structure_procedures(std::shared_ptr<state::structure> a_structure)
   }
   reader(a_structure);
   writer(a_structure);
+  sizer(a_structure);
 }
 
 void
@@ -963,6 +965,23 @@ generator::writer(std::shared_ptr<state::structure> a_structure)
 }
 
 void
+generator::sizer(std::shared_ptr<state::structure> a_structure)
+{
+  std::string name = a_structure->name();
+
+  m_src << tab << "function " << name << "_size(self, a_sizer)";
+  m_src << " result(nbytes)" << std::endl;
+  m_src << indent;
+  m_src << tab << "class(" << name << ") :: self" << std::endl;
+  m_src << tab << "type(archive_sizer), intent(in) :: a_sizer" << std::endl;
+  m_src << tab << "integer(kind = c_size_t) :: nbytes" << std::endl;
+  m_src << std::endl;
+  size_buffer(a_structure->fields(), false);
+  m_src << unindent;
+  m_src << tab << "end function" << std::endl << std::endl;
+}
+
+void
 generator::archive(const field_vector& a_fields, bool a_input)
 {
   bool first = true;
@@ -1000,6 +1019,48 @@ generator::archive(const std::string& a_name,
   else
   {
     m_src << " .and. &" << std::endl << tab << "         ";
+  }
+  m_src << method << "(" << var << ")";
+}
+
+void
+generator::size_buffer(const field_vector& a_fields, bool a_input)
+{
+  bool first = true;
+  for (const state::field& f : a_fields)
+  {
+    if (f.type()->is_map())
+    {
+      auto as_map = std::dynamic_pointer_cast<state::map>(f.type());
+      auto key_type = std::make_shared<state::vector>(as_map->key_type());
+      auto value_type = std::make_shared<state::vector>(as_map->value_type());
+      size_buffer(f.name() + "_k", key_type, a_input, first);
+      size_buffer(f.name() + "_v", value_type, a_input, false);
+    }
+    else
+    {
+      size_buffer(f.name(), f.type(), a_input, first);
+    }
+    first = false;
+  }
+  m_src << std::endl;
+}
+
+void
+generator::size_buffer(const std::string& a_name,
+                   std::shared_ptr<state::datatype> a_type,
+                   bool a_input,
+                   bool a_first)
+{
+  auto var = "self%" + member(a_name);
+  auto method = "a_sizer%" + category(a_type, a_input);
+  if (a_first)
+  {
+    m_src << tab << "nbytes = ";
+  }
+  else
+  {
+    m_src << " + &" << std::endl << tab << "         ";
   }
   m_src << method << "(" << var << ")";
 }
@@ -1205,6 +1266,7 @@ generator::client_request(const std::string& a_interface,
   m_src << tab << "type(request_header) :: header" << std::endl;
   if (has_args)
   {
+    m_src << tab << "type(archive_sizer) :: sizer" << std::endl;
     m_src << tab << "type(oarchive) :: archive" << std::endl;
     m_src << tab << "type(zmq_msg_t) :: message" << std::endl;
     m_src << tab << "integer(kind = c_int) :: code" << std::endl;
@@ -1215,11 +1277,21 @@ generator::client_request(const std::string& a_interface,
 
   if (has_args)
   {
-    m_src << tab << sizevar("archive_size", get_size(params));
+    m_src << tab << "archive_size = ";
+    first = true;
+    for (const field& f : params)
+    {
+      m_src << (first ? "" : " + ");
+      m_src << "sizer%" << category(f.type(), false);
+      m_src << "(" << param(f.name()) << ")";
+      first = false;
+    }
+    m_src << std::endl;
     m_src << tab << "code = zmq_msg_init_size(message, archive_size)" << std::endl;
     m_src << tab << "call c_f_pointer(zmq_msg_data(message), buffer)" << std::endl;
     m_src << tab << "call archive%create(buffer, archive_size)" << std::endl;
     m_src << tab << "status = ";
+    first = true;
     for (const field& f : params)
     {
       m_src << (first ? "" : " .and. ");
@@ -1293,6 +1365,7 @@ generator::server_handler(const std::string& a_interface,
   if (!is_void)
   {
     m_src << tab << "integer(kind = c_size_t) :: result_size" << std::endl;
+    m_src << tab << "type(archive_sizer) :: sizer" << std::endl;
     m_src << tab << result_type->target() << " :: r" << std::endl;
     if (is_container)
     {
@@ -1337,7 +1410,7 @@ generator::server_handler(const std::string& a_interface,
   }
   else
   {
-    m_src << tab << sizevar("result_size", get_size("r", result_type));
+    m_src << tab << "result_size = sizer%" << category(result, false) << "(r)" << std::endl;
     m_src << tab << "ptr => r" << std::endl;
     m_src << tab << "call self%reply_with_result_";
     m_src << category(result, false) << "(ptr, result_size)" << std::endl;
@@ -1444,8 +1517,9 @@ generator::server_throw(const std::string& a_interface,
   m_src << tab << "type(" << name << "), pointer, intent(in) :: a_exception" << std::endl;
   m_src << std::endl;
   m_src << tab << "integer(kind = c_size_t) :: size" << std::endl;
+  m_src << tab << "type(archive_sizer) :: sizer" << std::endl;
   m_src << tab << "class(serializable), pointer :: exception" << std::endl << std::endl;
-  m_src << tab << sizevar("size", get_size("a_exception", type));
+  m_src << tab << "size = sizer%" << category(a_exception, false) << "(a_exception)" << std::endl;
   m_src << tab << "exception => a_exception" << std::endl;
   m_src << tab << "call self%throw_exception(exception, " << a_id << ", size)" << std::endl;
   m_src << unindent;
@@ -1494,41 +1568,6 @@ generator::server_serve_once(const state::interface& a_interface)
   m_src << unindent << unindent;
   m_src << tab << "end select" << std::endl << unindent;
   m_src << tab << "end subroutine" << std::endl << std::endl;
-}
-
-std::shared_ptr<sizer>
-generator::get_size(const std::string& a_variable, pointer a_datatype) const
-{
-  return a_datatype->size(a_variable);
-}
-
-std::shared_ptr<sizer>
-generator::get_size(const field_vector& a_fields) const
-{
-  if (a_fields.empty())
-  {
-    return std::make_shared<sizer>("{}", 0);
-  }
-
-  bool first = true;
-  pointer field_type = nullptr;
-  std::shared_ptr<sizer> root = nullptr;
-  std::shared_ptr<sizer> next = nullptr;
-  for (const auto& field_ : a_fields)
-  {
-    field_type = translate(field_.type());
-    next = field_type->size(param(field_.name()));
-    if (first)
-    {
-      root = next;
-      first = false;
-    }
-    else
-    {
-      root->link(next);
-    }
-  }
-  return root;
 }
 
 std::set<std::string>
