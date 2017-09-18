@@ -23,15 +23,3 @@ file_size(const char* filename)
   }
   return sz;
 }
-
-int32_t
-downcast_uint32_t(int64_t x)
-{
-  return (int32_t) (uint32_t) x;
-}
-
-int64_t
-upcast_uint32_t(int32_t x)
-{
-  return (int64_t) (uint32_t) x;
-}

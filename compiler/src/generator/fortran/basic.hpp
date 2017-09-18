@@ -90,7 +90,7 @@ public:
   uint8& operator=(const uint8&) = delete;
 
   std::string in() const;
-  std::set<std::string> iso_c_symbols() const;
+  std::set<std::string> structures() const;
 };
 
 class uint16 : public basic
@@ -101,7 +101,7 @@ public:
   uint16& operator=(const uint16&) = delete;
 
   std::string in() const;
-  std::set<std::string> iso_c_symbols() const;
+  std::set<std::string> structures() const;
 };
 
 class uint32 : public basic
@@ -112,7 +112,7 @@ public:
   uint32& operator=(const uint32&) = delete;
 
   std::string in() const;
-  std::set<std::string> iso_c_symbols() const;
+  std::set<std::string> structures() const;
 };
 
 class uint64 : public basic
@@ -123,6 +123,7 @@ public:
   uint64& operator=(const uint64&) = delete;
 
   std::string in() const;
+  std::set<std::string> structures() const;
 };
 
 class real32 : public basic

@@ -8,6 +8,7 @@ module hermes
 
   use, intrinsic :: iso_c_binding
   use :: xdr
+  use :: uint
   use :: zmq
   implicit none
   private
@@ -349,11 +350,13 @@ contains
     logical :: status
 
     select type(a_object)
-      type is (integer(kind = c_int16_t))
+      type is (uint8_t)
         status = self%xdr%get_unsigned(a_object)
-      type is (integer(kind = c_int32_t))
+      type is (uint16_t)
         status = self%xdr%get_unsigned(a_object)
-      type is (integer(kind = c_int64_t))
+      type is (uint32_t)
+        status = self%xdr%get_unsigned(a_object)
+      type is (uint64_t)
         status = self%xdr%get_unsigned(a_object)
     end select
   end function
@@ -474,11 +477,13 @@ contains
     logical :: status
 
     select type(a_object)
-      type is (integer(kind = c_int16_t))
+      type is (uint8_t)
         status = self%xdr%put_unsigned(a_object)
-      type is (integer(kind = c_int32_t))
+      type is (uint16_t)
         status = self%xdr%put_unsigned(a_object)
-      type is (integer(kind = c_int64_t))
+      type is (uint32_t)
+        status = self%xdr%put_unsigned(a_object)
+      type is (uint64_t)
         status = self%xdr%put_unsigned(a_object)
     end select
   end function
@@ -569,11 +574,13 @@ contains
     integer(kind = c_size_t) :: nbytes
 
     select type(a_object)
-      type is (integer(kind = c_int16_t))
+      type is (uint8_t)
         nbytes = 4_c_size_t
-      type is (integer(kind = c_int32_t))
+      type is (uint16_t)
         nbytes = 4_c_size_t
-      type is (integer(kind = c_int64_t))
+      type is (uint32_t)
+        nbytes = 4_c_size_t
+      type is (uint64_t)
         nbytes = 8_c_size_t
     end select
   end function

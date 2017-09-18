@@ -74,43 +74,49 @@ int64::iso_c_symbols() const
 std::string
 uint8::in() const
 {
-  return "integer(kind = c_int16_t)";
+  return "type(uint8_t)";
 }
 
 std::set<std::string>
-uint8::iso_c_symbols() const
+uint8::structures() const
 {
-  return { "c_int16_t" };
+  return { "uint8_t" };
 }
 
 std::string
 uint16::in() const
 {
-  return "integer(kind = c_int32_t)";
+  return "type(uint16_t)";
 }
 
 std::set<std::string>
-uint16::iso_c_symbols() const
+uint16::structures() const
 {
-  return { "c_int32_t" };
+  return { "uint16_t" };
 }
 
 std::string
 uint32::in() const
 {
-  return "integer(kind = c_int64_t)";
+  return "type(uint32_t)";
 }
 
 std::set<std::string>
-uint32::iso_c_symbols() const
+uint32::structures() const
 {
-  return { "c_int64_t" };
+  return { "uint32_t" };
 }
 
 std::string
 uint64::in() const
 {
-  return "integer(kind = c_int64_t)";
+  return "type(uint64_t)";
+}
+
+std::set<std::string>
+uint64::structures() const
+{
+  return { "uint64_t" };
 }
 
 std::string
