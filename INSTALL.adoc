@@ -122,6 +122,16 @@ requiring C++ support.
 cmake -DWITH_CPP=ON -DWITH_FORTRAN=OFF /path/to/hermes-x.y.z
 ----
 
+=== Specifying Python Interpreter
+
+If your system has multiple Python interpreters you can directly specify paths
+to the desired interpreter and `pip` package manager to ensure they don't get mixed
+by CMake.
+
+----
+cmake -DPYTHON_EXECUTABLE:FILEPATH=/path/to/python -DPip_EXECUTABLE=/path/to/pip/or/pip2 /path/to/hermes-x.y.z
+----
+
 === Documentation
 
 By default, documentation will be built if the document generation toolchain
