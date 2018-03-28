@@ -2,6 +2,7 @@
 #define HERMES_COMPILER_GENERATOR_CPP_DATATYPE_HPP
 
 #include <iostream>
+#include <memory>
 #include <string>
 
 namespace hermes {

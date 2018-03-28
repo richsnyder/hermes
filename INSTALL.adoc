@@ -122,6 +122,33 @@ requiring C++ support.
 cmake -DWITH_CPP=ON -DWITH_FORTRAN=OFF /path/to/hermes-x.y.z
 ----
 
+=== Python
+
+If you have multiple installations of Python on your computer or if Python is
+installed in a nonstandard location, you may need to tell CMake where to find
+the correct Python executable.  This can be done using the `PYTHON_EXECUTABLE`
+file path variable.
+
+----
+cmake -DPYTHON_EXECUTABLE=/path/to/python /path/to/hermes-x.y.z
+----
+
+CMake also looks for a version of Pip, which is used to install the Hermes
+Python package.  CMake will first search for `pip2` or `pip3`, depending on the
+version of the Python executable, and then search for `pip`.  You can use the
+`Pip_EXECUTABLE` variable to specify the location of your Pip executable.
+
+----
+cmake -DPip_EXECUTABLE=/path/to/python /path/to/hermes-x.y.z
+----
+
+Finally, if you wish to install the Hermes Python package in the Python user
+install directory,
+
+----
+cmake -DPip_INSTALL_OPTIONS=--user
+----
+
 === Documentation
 
 By default, documentation will be built if the document generation toolchain
