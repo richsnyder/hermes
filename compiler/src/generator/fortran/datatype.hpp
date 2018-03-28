@@ -2,6 +2,7 @@
 #define HERMES_COMPILER_GENERATOR_FORTRAN_DATATYPE_HPP
 
 #include <iostream>
+#include <memory>
 #include <set>
 #include <string>
 #include "generator/fortran/sizer.hpp"
