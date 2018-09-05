@@ -6,6 +6,7 @@ SET(PYTHON_SOURCES
     hermes/error.py
     hermes/header.py
     hermes/server.py
+    hermes/utils.py
 )
 
 # Configure the setup script.
