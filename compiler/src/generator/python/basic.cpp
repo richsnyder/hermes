@@ -51,13 +51,13 @@ char_t::default_value() const
 void
 char_t::pack(std::ostream& a_out, const std::string& a_variable) const
 {
-  a_out << tab << "xdr.pack_fstring(self." << a_variable << ", 1)" << std::endl;
+  a_out << tab << "xdr.pack_fstring(" << a_variable << ", 1)" << std::endl;
 }
 
 void
 char_t::unpack(std::ostream& a_out, const std::string& a_variable) const
 {
-  a_out << tab << "xdr.unpack_fstring(1)" << std::endl;
+  a_out << tab << a_variable << " = xdr.unpack_fstring(1)" << std::endl;
 }
 
 int8::int8()
@@ -193,19 +193,15 @@ string::default_value() const
 }
 
 void
-string::pack(std::ostream& a_out,
-             const std::string& a_variable,
-             bool a_numpy) const
+string::pack(std::ostream& a_out, const std::string& a_variable) const
 {
-  a_out << tab << "xdr_pack_string(xdr, self." << a_variable << ")" << std::endl;
+  a_out << tab << "hermes.xdr_pack_string(xdr, " << a_variable << ")" << std::endl;
 }
 
 void
-string::unpack(std::ostream& a_out,
-               const std::string& a_variable,
-               bool a_numpy) const
+string::unpack(std::ostream& a_out, const std::string& a_variable) const
 {
-  a_out << tab << "xdr_unpack_string(xdr)" << std::endl;
+  a_out << tab << a_variable << " = hermes.xdr_unpack_string(xdr)" << std::endl;
 }
 
 } // python namespace
