@@ -192,6 +192,22 @@ string::default_value() const
   return "''";
 }
 
+void
+string::pack(std::ostream& a_out,
+             const std::string& a_variable,
+             bool a_numpy) const
+{
+  a_out << tab << "xdr_pack_string(xdr, self." << a_variable << ")" << std::endl;
+}
+
+void
+string::unpack(std::ostream& a_out,
+               const std::string& a_variable,
+               bool a_numpy) const
+{
+  a_out << tab << "xdr_unpack_string(xdr)" << std::endl;
+}
+
 } // python namespace
 } // generator namespace
 } // compiler namespace
