@@ -7,6 +7,7 @@
 #include <memory>
 #include <set>
 #include <stack>
+#include <algorithm>
 #include <vector>
 #include "state/alias.hpp"
 #include "state/constant.hpp"

@@ -148,17 +148,17 @@ module hermes
 
 contains
 
-  function hash(a_text) result(value)
+  function hash(a_text) result(a_value)
     character(kind = c_char, len = *), intent(in) :: a_text
-    integer(kind = c_int64_t) :: value
+    integer(kind = c_int64_t) :: a_value
 
     integer :: n
 
-    value = X'811C9DC5'
+    a_value = int(Z'811C9DC5', c_int64_t)
     do n = 1, len(a_text)
-      value = ieor(value, ichar(a_text(n:n)))
-      value = value * X'01000193'
-      value = iand(value, X'FFFFFFFF')
+      a_value = ieor(a_value, ichar(a_text(n:n), c_int64_t))
+      a_value = a_value * int(Z'01000193', c_int64_t)
+      a_value = iand(a_value, Z'FFFFFFFF')
     end do
   end function
 
